@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Starter App</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./assets/ceapp-i18n.js"></script>
+</head>
+<body>
+  <div class="shell">
+    <header class="header">
+      <img id="app-logo" class="app-logo" alt="" width="64" height="64">
+      <div>
+        <h1 id="app-title"></h1>
+        <p id="app-subtitle"></p>
+      </div>
+    </header>
+
+    <main class="panel">
+      <h2 id="panel-title"></h2>
+      <p id="panel-body"></p>
+      <button id="primary-action" type="button"></button>
+    </main>
+
+    <section class="panel ai-panel">
+      <h2 id="ai-title"></h2>
+      <p id="ai-body"></p>
+      <textarea id="ai-prompt"></textarea>
+      <div class="actions">
+        <button id="ai-text-action" type="button"></button>
+        <button id="ai-status-action" type="button"></button>
+      </div>
+      <pre id="ai-output"></pre>
+    </section>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>

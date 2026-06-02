@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "appId": "starter-app",
+  "name": "Starter App",
+  "nameI18n": {
+    "zh-CN": "Starter App",
+    "en-US": "Starter App"
+  },
+  "version": "1.0.0",
+  "description": "Offline-first bilingual starter app.",
+  "descriptionI18n": {
+    "zh-CN": "一个可离线打开、跟随 CanEngine 语言的 ceapp 模板。",
+    "en-US": "An offline-first ceapp template that follows the CanEngine language."
+  },
+  "entry": "index.html",
+  "icon": "assets/logo.png",
+  "minCanEngineVersion": "1.4.1",
+  "platforms": [
+    {
+      "os": "*",
+      "arch": "*"
+    }
+  ],
+  "commands": {
+    "noop": {
+      "executable": "echo",
+      "baseArgs": ["starter-app"]
+    }
+  },
+  "capabilities": {
+    "ai": {
+      "required": false,
+      "features": [
+        "ai.text.generate",
+        "ai.vision.analyze",
+        "ai.image.generate",
+        "ai.model3d.generate",
+        "ai.video.generate"
+      ]
+    }
+  },
+  "permissions": [
+    "ai.text.generate",
+    "ai.vision.analyze",
+    "ai.image.generate",
+    "ai.model3d.generate",
+    "ai.video.generate"
+  ]
+}
