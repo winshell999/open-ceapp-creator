@@ -56,6 +56,7 @@ Pick the lightest runtime that fits:
 - `references/bilingual-framework.md`: locale flow, message tables, and bilingual structure
 - `references/offline-runtime.md`: offline packaging hygiene and asset expectations
 - `references/manifest-and-host-bridge.md`: `app.json` and `window.CanEngine` bridge usage
+- `references/phone-bridge.md`: public-safe Phone Bridge usage for CEAPP source projects
 - `references/packaging-and-signing.md`: how generated projects are packaged and signed by CanEngine
 
 ## Workflow
@@ -73,7 +74,8 @@ Pick the lightest runtime that fits:
    - `assetDataURL(appId, path)` for small inline or copy workflows
 7. For file inputs, support normal picker flow first and add drag/drop or clipboard when the task benefits from it.
 8. Keep the CEAPP source root clean and self-contained.
-9. Do not create official, KOL, or trusted signatures in the skill output.
+9. If the app needs phone-to-desktop intake, prefer the system `window.CanEngine.phoneBridge` APIs instead of inventing a custom LAN upload server inside the CEAPP.
+10. Do not create official, KOL, or trusted signatures in the skill output.
 
 ## Rules
 
@@ -85,6 +87,7 @@ Pick the lightest runtime that fits:
 - Prefer simple static HTML/CSS/JS when that is enough.
 - Keep `window.CanEngine` integration graceful: the app should still be debuggable in a normal browser when practical.
 - Do not include private keys, signing secrets, official key IDs, KOL key IDs, or default trusted publisher credentials in generated projects.
+- Do not embed private local IPs, hard-coded session tokens, raw filesystem paths, or internal-only debugging endpoints in public CEAPP source.
 - Do not describe self-signing as official certification or security review.
 
 ## Packaging Handoff
