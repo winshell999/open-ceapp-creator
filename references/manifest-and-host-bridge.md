@@ -93,6 +93,77 @@ Rules:
 - Do not wire the UI to the dummy command.
 - Replace the dummy command with a real one as soon as the app genuinely needs host-run execution.
 
+## Data Bridge Manifest Additions
+
+CanEngine keeps the existing `permissions: string[]` contract and adds Data Bridge as a compatible capability extension.
+
+Recommended MVP shape:
+
+```json
+{
+  "capabilities": {
+    "dataBridge": {
+      "required": true,
+      "datasets": ["students_dataset"],
+      "actions": ["list_by_grade"],
+      "mode": "read"
+    }
+  },
+  "permissions": [
+    "data.read",
+    "data.write",
+    "data.action",
+    "data.schema"
+  ]
+}
+```
+
+Rules:
+
+- `datasets` lists shared dataset IDs the app expects to read.
+- `actions` lists shared action IDs the app may invoke.
+- `mode` should stay conservative for MVP. Prefer `read` unless the app truly needs export-style behavior.
+- `data.write` is for the app's own local store only; it does not grant shared dataset writes.
+- Do not invent wildcard dataset IDs or action IDs in app manifests. Declare exact resource IDs.
+
+## Data Bridge JS Surface
+
+Current CEAPP-facing Data Bridge APIs are exposed on `window.CanEngine.data`:
+
+```js
+const bridge = window.CanEngine || (window.parent && window.parent.CanEngine)
+
+await bridge.data.local('notes').put({ id: 'note-1', title: 'Hello' })
+const localRows = await bridge.data.local('notes').find({ limit: 20 })
+
+const sharedRows = await bridge.data.dataset('students_dataset').find({
+  where: { grade: 'A' },
+  limit: 10,
+  sort: [{ field: 'name', direction: 'asc' }]
+})
+
+const schema = await bridge.data.schema('students_dataset')
+
+const actionRows = await bridge.data.action('list_by_grade', {
+  grade: 'A'
+})
+```
+
+MVP behavior:
+
+- `data.local(collection)` is app-private and stored in the calling app's own local SQLite space.
+- `data.dataset(datasetId).find(...)` only supports basic filtering, sorting, and pagination.
+- `data.schema(datasetId)` returns the declared dataset columns from the host-managed dataset store.
+- `data.action(actionId, params)` is the only supported path for complex shared queries.
+- Shared dataset and action access will trigger a host permission prompt on first use.
+
+Do not document or depend on:
+
+- host filesystem absolute paths
+- real source credentials
+- internal localhost debug endpoints
+- direct SQL access from CEAPP into shared databases
+
 ## Icon Notes
 
 - `icon` should be a package-relative path.
