@@ -86,6 +86,13 @@ textarea {
   line-height: 1.6;
 }
 
+.panel-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
 #primary-action {
   margin-top: 18px;
   min-height: 40px;
@@ -101,6 +108,40 @@ textarea {
 .ai-panel {
   display: grid;
   gap: 14px;
+}
+
+.notification-panel {
+  display: grid;
+  gap: 14px;
+}
+
+.notification-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.notification-note {
+  padding: 16px;
+  border: 1px solid #dbe4f0;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #ffffff, #eff6ff);
+}
+
+.notification-note strong {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.notification-note ul {
+  margin: 0;
+  padding-left: 20px;
+  color: #475569;
+  line-height: 1.6;
+}
+
+.notification-note li + li {
+  margin-top: 8px;
 }
 
 .ai-panel textarea {
@@ -136,6 +177,9 @@ textarea {
   background: #4f46e5;
 }
 
+#notification-status-output,
+#notification-feature-output,
+#notification-action-output,
 #ai-output {
   min-height: 120px;
   max-height: 320px;
@@ -146,4 +190,15 @@ textarea {
   color: #dbeafe;
   background: #0f172a;
   white-space: pre-wrap;
+}
+
+@media (max-width: 880px) {
+  .panel-head,
+  .notification-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .panel-head {
+    display: grid;
+  }
 }

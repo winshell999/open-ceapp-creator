@@ -14,6 +14,7 @@ This skill is responsible for:
 - generating a CEAPP project root directory
 - creating or updating `app.json`, `index.html`, CSS, JS, local assets, and docs
 - keeping the project compatible with CanEngine host bridge conventions
+- wiring public-safe examples for current host bridges such as locale sync, AI Bridge, and Notification Bridge when the task needs them
 - keeping the project offline-safe where practical
 - preparing the project so it can be dragged into CanEngine for packaging and signing
 
@@ -48,6 +49,7 @@ Unless the user explicitly asks otherwise, build with these assumptions:
 Pick the lightest runtime that fits:
 
 - Prefer `assets/starter/` for simple tools, utilities, demos, and operator workflows.
+- The current `assets/starter/` already includes minimal AI Bridge and Notification Bridge examples that can be trimmed down or expanded.
 - Use a bundled framework build only when the UI really needs React, Vue, or another frontend stack.
 - If a framework is used, the shipped `index.html`, CSS, JS, icons, images, and fonts must all be local files.
 
@@ -73,9 +75,14 @@ Pick the lightest runtime that fits:
    - `assetURL(appId, path)` for `<img>`, `<audio>`, and `<video>`
    - `assetDataURL(appId, path)` for small inline or copy workflows
 7. For file inputs, support normal picker flow first and add drag/drop or clipboard when the task benefits from it.
-8. Keep the CEAPP source root clean and self-contained.
-9. If the app needs phone-to-desktop intake, prefer the system `window.CanEngine.phoneBridge` APIs instead of inventing a custom LAN upload server inside the CEAPP.
-10. Do not create official, KOL, or trusted signatures in the skill output.
+8. When the app needs notifications, keep the creation flow in the app:
+   - declare flat `permissions` strings such as `notification.send` and `notification.schedule`
+   - optionally add `capabilities.notification` metadata for display copy
+   - create, re-enable, update, and delete features only through `window.CanEngine.notification.*`
+   - treat Notification Bridge settings as bridge-side governance rather than an authoring surface
+9. Keep the CEAPP source root clean and self-contained.
+10. If the app needs phone-to-desktop intake, prefer the system `window.CanEngine.phoneBridge` APIs instead of inventing a custom LAN upload server inside the CEAPP.
+11. Do not create official, KOL, or trusted signatures in the skill output.
 
 ## Rules
 

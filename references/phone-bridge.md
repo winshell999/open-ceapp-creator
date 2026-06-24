@@ -113,7 +113,7 @@ Remove permissions that the app does not actually need before shipping.
 
 ## Good Public Reference
 
-- `Apps/demo/` in the CanEngine workspace is the current feature-rich CEAPP example for Phone Bridge, AI Bridge, assets, jobs, and file staging.
+- `Apps/demo/` in the CanEngine workspace is the current feature-rich CEAPP example for Notification Bridge, Phone Bridge, AI Bridge, assets, jobs, and file staging.
 
 ## Do Not Do This
 

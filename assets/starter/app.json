@@ -14,7 +14,7 @@
   },
   "entry": "index.html",
   "icon": "assets/logo.png",
-  "minCanEngineVersion": "1.4.1",
+  "minCanEngineVersion": "1.5.3",
   "platforms": [
     {
       "os": "*",
@@ -37,6 +37,14 @@
         "ai.model3d.generate",
         "ai.video.generate"
       ]
+    },
+    "notification": {
+      "required": false,
+      "reason": "演示应用主动注册通知功能，并通过通知桥发送即时通知。",
+      "capabilities": [
+        "send",
+        "schedule"
+      ]
     }
   },
   "permissions": [
@@ -44,6 +52,8 @@
     "ai.vision.analyze",
     "ai.image.generate",
     "ai.model3d.generate",
-    "ai.video.generate"
+    "ai.video.generate",
+    "notification.send",
+    "notification.schedule"
   ]
 }

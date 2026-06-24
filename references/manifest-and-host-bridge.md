@@ -126,6 +126,37 @@ Rules:
 - `data.write` is for the app's own local store only; it does not grant shared dataset writes.
 - Do not invent wildcard dataset IDs or action IDs in app manifests. Declare exact resource IDs.
 
+## Notification Bridge Manifest Additions
+
+CanEngine keeps Notification Bridge aligned with the existing flat `permissions: string[]` manifest contract.
+
+Recommended shape:
+
+```json
+{
+  "minCanEngineVersion": "1.5.0",
+  "capabilities": {
+    "notification": {
+      "required": false,
+      "reason": "Explain why the app needs to notify the user.",
+      "capabilities": ["send", "schedule"]
+    }
+  },
+  "permissions": [
+    "notification.send",
+    "notification.schedule"
+  ]
+}
+```
+
+Rules:
+
+- `notification.send` is for runtime immediate notifications initiated by the app.
+- `notification.schedule` is for persisted registered features such as schedule, app event, or system event notifications.
+- `capabilities.notification` is optional metadata for display copy; permission checks still use the flat `permissions` array.
+- Only request the capabilities the app actually needs. A runtime-only app may declare just `notification.send`.
+- Feature creation belongs to the app or system module. Notification Bridge is governance and routing, not a bridge-side feature authoring surface.
+
 ## Data Bridge JS Surface
 
 Current CEAPP-facing Data Bridge APIs are exposed on `window.CanEngine.data`:
@@ -460,6 +491,93 @@ const response = await bridge.ai.vision.analyze({
   maxTokens: 500
 })
 ```
+
+#### Notification Bridge (CanEngine 1.5.0+)
+
+Notification Bridge is exposed under `window.CanEngine.notification`.
+
+Current CEAPP-facing methods:
+
+- `notification.send(request) => Promise<NotificationSendResult>`
+- `notification.registerFeature(config) => Promise<NotificationFeatureView>`
+- `notification.updateFeature(featureId, patch) => Promise<NotificationFeatureView>`
+- `notification.removeFeature(featureId) => Promise<void>`
+- `notification.listOwnFeatures() => Promise<NotificationFeatureView[]>`
+- `notification.getStatus() => Promise<NotificationBridgeStatus>`
+- `notification.openSettings() => Promise<void>`
+
+Governance rules:
+
+- The CEAPP is the source of truth for whether a feature exists and whether the source-side switch is on.
+- A feature is only effective when source-side enabled, bridge-side enabled, global Notification Bridge enabled, and permission granted are all true.
+- If the app deletes a feature, the bridge record is removed.
+- If the bridge deletes a feature, the host keeps a tombstone so the app will not auto-restore it on next launch; the app must explicitly save or re-enable it again.
+
+Recommended direct runtime send example:
+
+```js
+const bridge = window.CanEngine || (window.parent && window.parent.CanEngine)
+
+const result = await bridge.notification.send({
+  title: 'Build finished',
+  content: 'Your export is ready.',
+  level: 'info',
+  category: 'runtime'
+})
+
+console.log(result)
+```
+
+Recommended persistent feature registration example:
+
+```js
+const bridge = window.CanEngine || (window.parent && window.parent.CanEngine)
+
+await bridge.notification.registerFeature({
+  featureId: 'daily-brief',
+  name: 'Daily Brief',
+  triggerType: 'schedule',
+  entry: 'brief.daily',
+  schedule: {
+    type: 'interval',
+    everyMinutes: 60
+  },
+  level: 'info',
+  defaultChannels: ['local'],
+  sourceEnabled: true,
+  reactivate: true
+})
+```
+
+Update and delete examples:
+
+```js
+await bridge.notification.updateFeature('daily-brief', {
+  sourceEnabled: false
+})
+
+await bridge.notification.removeFeature('daily-brief')
+```
+
+Status inspection example:
+
+```js
+const status = await bridge.notification.getStatus()
+const features = await bridge.notification.listOwnFeatures()
+
+console.log(status, features)
+```
+
+Important current status values:
+
+- `active`
+- `disabled_by_app`
+- `disabled_by_bridge`
+- `disabled_globally`
+- `permission_revoked`
+- `deleted_by_app`
+- `deleted_by_bridge`
+- `engine_offline`
 
 ### Current Data Shapes
 
