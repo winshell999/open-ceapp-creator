@@ -361,12 +361,17 @@ These are the methods currently exposed to ceapps on `window.CanEngine`.
 
 #### File input and drag/drop
 
-- `stageFile(request: { appId: string, name?: string, dataBase64?: string, sourcePath?: string }) => Promise<StagedFile>`
+- `stageFile(request: { appId: string, name?: string, dataBase64?: string, sourcePath?: string, mime?: string }) => Promise<StagedFile>`
   - Use `dataBase64` when staging a file already held in browser memory.
   - Use `sourcePath` when the host gives you a real OS file path, such as native file drop.
   - When `sourcePath` is provided, the host can derive `name` automatically from the filename.
+- `getStagedFile(fileId: string) => Promise<StagedFile>`
+- `removeStagedFile(fileId: string) => Promise<{ ok: boolean }>`
 - `stageFileDialog(appId: string) => Promise<StagedFile>`
 - `stageFilesDialog(appId: string) => Promise<StagedFile[]>`
+- `chooseFile(options: { appId: string, title?: string, accept?: string[] }) => Promise<StagedFile | null>`
+- `chooseFiles(options: { appId: string, title?: string, accept?: string[] }) => Promise<StagedFile[]>`
+- `chooseDirectory(options?: { title?: string, defaultPath?: string }) => Promise<ChosenDirectory | null>`
 - `onFileDrop(handler: ({ x: number, y: number, paths: string[] }) => void) => unsubscribe`
   - This is the host-native file-drop bridge for dragging files from Finder / Explorer into CanEngine.
   - In hosted ceapps, OS file drag into the inner iframe may not reliably reach inner DOM `drop` listeners.
@@ -383,12 +388,21 @@ These are the methods currently exposed to ceapps on `window.CanEngine`.
 #### Jobs and long-running work
 
 - `runJob(request: { appId: string, commandId: string, args?: string[], inputFileIds?: string[], mode?: string }) => Promise<JobInfo>`
+- `getJob(jobId: string) => Promise<JobInfo>`
+- `listJobs(filter?: { appId?: string, status?: string, limit?: number }) => Promise<JobInfo[]>`
+- `getJobLogs(jobId: string) => Promise<JobLogs>`
 - `cancelJob(jobId: string) => Promise<void>`
 - `onEvent(name: string, handler: (payload: any) => void) => unsubscribe`
   - Use this for host event streams such as job updates.
+  - Current job event names include both legacy and new forms:
+    - `job:started`, `job:log`, `job:completed`, `job:failed`, `job:cancelled`
+    - `job.started`, `job.stdout`, `job.stderr`, `job.file`, `job.completed`, `job.failed`, `job.cancelled`
 
 #### Results and output handling
 
+- `exportFile(input: { jobId?: string, fileRef?: string, sourcePath?: string, suggestedName?: string, targetDirectoryId?: string }) => Promise<ExportedFile>`
+- `openFile(input: { jobId?: string, fileRef?: string, sourcePath?: string }) => Promise<{ ok: boolean }>`
+- `revealFile(input: { jobId?: string, fileRef?: string, sourcePath?: string }) => Promise<{ ok: boolean }>`
 - `resultDataURL(path: string) => Promise<string>`
   - Reads a staged or result file and returns a `data:` URL.
 - `saveAs(path: string) => Promise<string>`
@@ -400,14 +414,29 @@ These are the methods currently exposed to ceapps on `window.CanEngine`.
 - `openResult(path: string) => Promise<void>`
 - `revealResult(path: string) => Promise<void>`
 
+Prefer `exportFile`, `openFile`, and `revealFile` whenever the file comes from a host-managed job result. Use raw path helpers only for compatibility or browser-first fallbacks.
+
 #### Runtime and environment management
 
+- `getHostVersion() => Promise<{ hostVersion: string, apiVersion: string, platform: string }>`
+- `getCapabilities() => Promise<{ hostVersion: string, apiVersion: string, platform: string, capabilities: HostCapability[] }>`
+- `hasCapability(capabilityId: string) => Promise<boolean>`
+- `getRuntimeStatus() => Promise<{ ok: boolean, runtimes: RuntimeInfo[] }>`
+- `requireRuntime(runtimeId: string) => Promise<{ id: string, ok: boolean, runtime: RuntimeInfo, message?: string }>`
 - `listRuntimes() => Promise<PlatformRuntime[]>`
 - `checkRuntimes(runtimeIds: string[]) => Promise<PlatformRuntime[]>`
 - `installRuntime(runtimeId: string) => Promise<RuntimeInstallResult>`
 - `getAppRuntimeStatus(appId: string) => Promise<AppRuntimeStatusResult>`
 - `envCheck(appId: string) => Promise<EnvCheckResult>`
 - `envInstall(appId: string, dependencyId: string) => Promise<EnvInstallResult>`
+
+For new CEAPP work, prefer `getHostVersion`, `getCapabilities`, `hasCapability`, `getRuntimeStatus`, and `requireRuntime` for host discovery. Keep `listRuntimes`, `getAppRuntimeStatus`, and `envCheck` only when you need legacy compatibility or installer UX.
+
+#### Diagnostics
+
+- `getDiagnostics(appId: string) => Promise<Diagnostics>`
+- `copyDiagnostics(appId: string) => Promise<{ ok: boolean }>`
+- `exportDiagnostics(appId: string) => Promise<ExportedFile>`
 
 #### Host-injected globals
 
@@ -589,6 +618,7 @@ type StageFileRequest = {
   name?: string
   dataBase64?: string
   sourcePath?: string
+  mime?: string
 }
 
 type StagedFile = {
@@ -597,6 +627,22 @@ type StagedFile = {
   name: string
   path: string
   size: number
+  mime?: string
+  sha256?: string
+  createdAt: string
+}
+
+type ChooseFileOptions = {
+  appId: string
+  title?: string
+  accept?: string[]
+}
+
+type ChosenDirectory = {
+  id: string
+  path: string
+  name: string
+  writable: boolean
   createdAt: string
 }
 
@@ -608,12 +654,62 @@ type JobRequest = {
   mode?: string
 }
 
+type JobInfo = {
+  id: string
+  appId: string
+  commandId: string
+  ok: boolean
+  status: string
+  command?: string[]
+  cwd?: string
+  inputDir: string
+  outputDir: string
+  workDir?: string
+  resultJson?: string
+  error?: string
+  exitCode?: number
+  stdout?: string
+  stderr?: string
+  logs?: string[]
+  startedAt: string
+  endedAt?: string
+  durationMs?: number
+  files: ResultFile[]
+}
+
+type JobLogs = {
+  jobId: string
+  stdout: string
+  stderr: string
+  logs: string[]
+  exitCode?: number
+}
+
 type ResultFile = {
+  fileRef?: string
   name: string
   path: string
   type: string
   mime: string
   size: number
+}
+
+type ExportFileInput = {
+  jobId?: string
+  fileRef?: string
+  sourcePath?: string
+  suggestedName?: string
+  targetDirectoryId?: string
+}
+
+type Diagnostics = {
+  app: any
+  host: any
+  capabilities: any
+  runtime: any
+  permissions: Array<{ id: string, granted: boolean }>
+  recentJobs: JobInfo[]
+  recentErrors: Array<{ time: string, message: string, stack?: string }>
 }
 
 type TextGenerateRequest = {
@@ -703,15 +799,15 @@ Prefer shared CanEngine runtimes for first-party apps instead of making each app
 Current runtime ids:
 
 - `base-runtime`
-- `ai-image-runtime`
+- `python-runtime`
+- `node-runtime`
 - `video-runtime`
-- `advanced-analysis-runtime`
 
 Recommended pattern:
 
 1. declare `runtime.requirements` in `app.json`
-2. detect readiness with `getAppRuntimeStatus(appId)`
-3. request installs with `installRuntime(runtimeId)`
+2. gate UI with `getRuntimeStatus()` or `requireRuntime(runtimeId)`
+3. use `getAppRuntimeStatus(appId)` and `installRuntime(runtimeId)` only when you need host-managed install flows
 4. keep `environment.dependencies` only when you still need legacy `envCheck` / `envInstall` fallback support
 
 ## Critical Interaction Guidance
