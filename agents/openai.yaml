@@ -1,0 +1,4 @@
+interface:
+  display_name: "Open CEAPP Creator"
+  short_description: "Create clear, offline-ready CEAPP source projects"
+  default_prompt: "Use $open-ceapp-creator to build a bilingual, package-ready CEAPP with a useful offline core and minimal permissions."

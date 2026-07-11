@@ -34,7 +34,8 @@ The ceapp should:
 - subscribe once on startup
 - update `document.documentElement.lang`
 - re-render visible copy when locale changes
-- avoid showing a duplicate language toggle unless the user explicitly wants local override UX
+- localize document title, labels, placeholders, empty/error states, image alt text, and accessible names
+- avoid showing a duplicate language toggle unless changing platform language is the requested feature
 
 ## Message Table Shape
 
@@ -58,6 +59,7 @@ const messages = {
 - Keep a single `t()` function close to the app root.
 - Do not translate command IDs, API flags, filenames, or machine-facing values.
 - Translate UI copy, hints, empty states, modal text, menu labels, status labels, and error copy shown to users.
+- Keep the `zh-CN` and `en-US` key sets identical. Treat a missing translation as a validation failure, not a fallback strategy.
 - Dynamic strings should use interpolation:
 
 ```js
@@ -93,3 +95,11 @@ The current CanEngine platform already owns locale state and exposes a host brid
 - avoid adding extra locale controls by default
 
 Only add an in-app language toggle for demos, settings tools, or apps where changing the platform language is the requested feature.
+
+## Verification
+
+1. Start in `zh-CN`, exercise every empty/loading/success/error state, and inspect the document title and accessible labels.
+2. Change the CanEngine platform language to `en-US` while the app remains open.
+3. Confirm visible copy rerenders without reloading or losing user input.
+4. Repeat in standalone browser mode with `navigator.language` or the app-local fallback.
+5. Search for user-facing string literals outside the message tables and either localize or justify them.

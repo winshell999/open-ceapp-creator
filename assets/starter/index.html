@@ -1,69 +1,83 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Starter App</title>
+  <meta name="color-scheme" content="light">
+  <title>Starter Notes</title>
   <link rel="stylesheet" href="./styles.css">
   <script src="./assets/ceapp-i18n.js"></script>
 </head>
 <body>
   <div class="shell">
-    <header class="header">
-      <img id="app-logo" class="app-logo" alt="" width="64" height="64">
-      <div>
-        <h1 id="app-title"></h1>
-        <p id="app-subtitle"></p>
+    <header class="hero">
+      <div class="identity">
+        <img id="app-logo" src="./assets/logo.png" alt="" width="56" height="56">
+        <div>
+          <p class="eyebrow" data-i18n="app.eyebrow"></p>
+          <h1 data-i18n="app.title"></h1>
+          <p data-i18n="app.subtitle"></p>
+        </div>
       </div>
+      <span id="host-status" class="status-pill"></span>
     </header>
 
-    <main class="panel">
-      <h2 id="panel-title"></h2>
-      <p id="panel-body"></p>
-      <button id="primary-action" type="button"></button>
-    </main>
-
-    <section class="panel notification-panel">
-      <div class="panel-head">
+    <main>
+      <section class="card intro-card">
         <div>
-          <h2 id="notification-title"></h2>
-          <p id="notification-body"></p>
+          <span class="section-label">01</span>
+          <h2 data-i18n="intro.title"></h2>
+          <p data-i18n="intro.body"></p>
         </div>
-        <div class="actions">
-          <button id="notification-refresh" type="button"></button>
-          <button id="notification-open-settings" type="button"></button>
-          <button id="notification-register" type="button"></button>
-          <button id="notification-toggle" type="button"></button>
-          <button id="notification-send-direct" type="button"></button>
-          <button id="notification-send-feature" type="button"></button>
-          <button id="notification-delete" type="button"></button>
-        </div>
-      </div>
-      <div class="notification-grid">
-        <div class="notification-note">
-          <strong id="notification-rules-title"></strong>
-          <ul id="notification-rules-list"></ul>
-        </div>
-        <pre id="notification-status-output"></pre>
-      </div>
-      <div class="notification-grid">
-        <pre id="notification-feature-output"></pre>
-        <pre id="notification-action-output"></pre>
-      </div>
-    </section>
+        <ol class="quality-list">
+          <li data-i18n="intro.ruleUseful"></li>
+          <li data-i18n="intro.ruleLocal"></li>
+          <li data-i18n="intro.ruleMinimal"></li>
+        </ol>
+      </section>
 
-    <section class="panel ai-panel">
-      <h2 id="ai-title"></h2>
-      <p id="ai-body"></p>
-      <textarea id="ai-prompt"></textarea>
-      <div class="actions">
-        <button id="ai-text-action" type="button"></button>
-        <button id="ai-status-action" type="button"></button>
-      </div>
-      <pre id="ai-output"></pre>
-    </section>
+      <section class="card">
+        <div class="section-heading">
+          <div><span class="section-label">02</span><h2 data-i18n="notes.title"></h2><p data-i18n="notes.body"></p></div>
+          <span id="storage-mode" class="status-pill quiet"></span>
+        </div>
+        <form id="note-form" class="input-row">
+          <label class="sr-only" for="note-input" data-i18n="notes.label"></label>
+          <input id="note-input" type="text" maxlength="120" required data-i18n-placeholder="notes.placeholder">
+          <button class="button primary" type="submit" data-i18n="notes.add"></button>
+        </form>
+        <div id="notes-list" class="notes-list" aria-live="polite"></div>
+      </section>
+
+      <section class="card">
+        <div class="section-heading">
+          <div><span class="section-label">03</span><h2 data-i18n="files.title"></h2><p data-i18n="files.body"></p></div>
+          <button id="pick-file" class="button secondary" type="button" data-i18n="files.pick"></button>
+        </div>
+        <input id="file-input" type="file" accept="image/*,application/pdf,text/plain" hidden>
+        <div id="drop-zone" class="drop-zone" tabindex="0">
+          <strong data-i18n="files.dropTitle"></strong>
+          <span data-i18n="files.dropBody"></span>
+        </div>
+        <div id="file-preview" class="file-preview empty"></div>
+      </section>
+
+      <section class="card release-card">
+        <div>
+          <span class="section-label">04</span>
+          <h2 data-i18n="release.title"></h2>
+          <p data-i18n="release.body"></p>
+        </div>
+        <div class="release-grid">
+          <div><strong data-i18n="release.offline"></strong><span data-i18n="release.offlineBody"></span></div>
+          <div><strong data-i18n="release.locale"></strong><span id="locale-value"></span></div>
+          <div><strong data-i18n="release.permission"></strong><span>data.read · data.write</span></div>
+        </div>
+      </section>
+    </main>
   </div>
 
+  <div id="toast" class="toast" hidden role="status" aria-live="polite"></div>
   <script src="./app.js"></script>
 </body>
 </html>

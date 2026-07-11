@@ -1,20 +1,20 @@
 {
   "schemaVersion": 1,
   "appId": "starter-app",
-  "name": "Starter App",
+  "name": "Starter Notes",
   "nameI18n": {
-    "zh-CN": "Starter App",
-    "en-US": "Starter App"
+    "zh-CN": "Starter Notes",
+    "en-US": "Starter Notes"
   },
   "version": "1.0.0",
-  "description": "Offline-first bilingual starter app.",
+  "description": "An offline-first bilingual CEAPP starter with one useful local feature.",
   "descriptionI18n": {
-    "zh-CN": "一个可离线打开、跟随 CanEngine 语言的 ceapp 模板。",
-    "en-US": "An offline-first ceapp template that follows the CanEngine language."
+    "zh-CN": "一个离线优先、双语并包含实用本地功能的 CEAPP 起点。",
+    "en-US": "An offline-first bilingual CEAPP starter with one useful local feature."
   },
   "entry": "index.html",
   "icon": "assets/logo.png",
-  "minCanEngineVersion": "1.5.5",
+  "minCanEngineVersion": "1.5.8",
   "platforms": [
     {
       "os": "*",
@@ -24,36 +24,25 @@
   "commands": {
     "noop": {
       "executable": "echo",
-      "baseArgs": ["starter-app"]
+      "baseArgs": [
+        "starter-app"
+      ],
+      "allowedFlags": []
     }
   },
   "capabilities": {
-    "ai": {
+    "dataBridge": {
       "required": false,
-      "features": [
-        "ai.text.generate",
-        "ai.vision.analyze",
-        "ai.image.generate",
-        "ai.model3d.generate",
-        "ai.video.generate"
-      ]
-    },
-    "notification": {
-      "required": false,
-      "reason": "演示应用主动注册通知功能，并通过通知桥发送即时通知。",
-      "capabilities": [
-        "send",
-        "schedule"
-      ]
+      "local": {
+        "enabled": true,
+        "dbFile": "starter-app.sqlite",
+        "schemaEntry": "data/localdb.schema.json",
+        "schemaVersion": 1
+      }
     }
   },
   "permissions": [
-    "ai.text.generate",
-    "ai.vision.analyze",
-    "ai.image.generate",
-    "ai.model3d.generate",
-    "ai.video.generate",
-    "notification.send",
-    "notification.schedule"
+    "data.read",
+    "data.write"
   ]
 }

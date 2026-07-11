@@ -1,119 +1,127 @@
 ---
 name: open-ceapp-creator
-description: Use this skill when creating or updating a public CanEngine CEAPP source project that can be packaged and signed by the CanEngine client. This skill generates standard CEAPP project files, local assets, bilingual support, and host-bridge compatible code; it does not create official/KOL signatures or final trusted distribution packages.
+description: Create or update a public, package-ready CanEngine CEAPP source project with an offline-capable local shell, zh-CN/en-US localization, minimal app.json permissions, browser-safe fallbacks, and current Host Bridge patterns. Use when generating a new CEAPP, improving an existing CEAPP, adding AI/Data/Phone/Notification/file/job integrations, or preparing a clean project folder for CanEngine packaging and signing. Do not use it to create official/KOL signatures or embed private credentials.
 ---
 
-# open-ceapp-creator
+# Open CEAPP Creator
 
-Use this skill for public-facing CanEngine application source work. It is the open version of the CEAPP starter workflow and is designed for external developers, creators, and KOL partners who want to generate a clean CEAPP project directory that can later be packaged and signed inside CanEngine.
+Create a clean CEAPP source project that another developer can understand, test, and package in CanEngine. Optimize for one useful product flow, not maximum bridge coverage.
 
-## Scope Boundary
+## Public boundary
 
-This skill is responsible for:
+Produce source files only. Do not generate or claim:
 
-- generating a CEAPP project root directory
-- creating or updating `app.json`, `index.html`, CSS, JS, local assets, and docs
-- keeping the project compatible with CanEngine host bridge conventions
-- wiring public-safe examples for current host bridges such as locale sync, AI Bridge, and Notification Bridge when the task needs them
-- keeping the project offline-safe where practical
-- preparing the project so it can be dragged into CanEngine for packaging and signing
+- an official, KOL, or trusted signature
+- a final trusted distribution package
+- publisher private keys, signing secrets, or reusable credentials
+- private IP addresses, session URLs, tokens, absolute user paths, or internal endpoints
 
-This skill is not responsible for:
+Use CanEngine's packaging and signing screen for the final `.ceapp`. Read `references/packaging-and-signing.md` before handing off packaging instructions.
 
-- generating final official `.ceapp` distribution packages
-- generating KOL-signed packages
-- storing or using CanEngine official private keys
-- storing or using KOL private keys
-- providing trusted publisher certification
-- bypassing CanEngine packaging/signing flows
+## Start with context
 
-Final `.ceapp` packaging and source-label signing must be done by CanEngine:
+1. Inspect the target directory before editing. Preserve unrelated user changes.
+2. If running in a CanEngine Canvas with Local MCP V2, call `get_work_context` once for the active Canvas, profile, permissions, limits, and selected Skill summaries. Read selected Skill content only through `read_selected_skills` and `read_skill_file`; do not guess a Canvas ID or read a Skill through ordinary project-file APIs.
+3. Write a one-sentence product contract: **user + task + finished result**.
+4. Choose a runtime strategy from `references/offline-runtime.md`. Default to `offline-strict`; use `hybrid-online` only when remote data or AI is part of the product.
+5. Choose the lightest implementation. Prefer local HTML/CSS/JS for small tools. Use a framework only when state or UI complexity justifies a local bundled build.
 
-`CanEngine → 我的 → 开发者身份 / CEAPP打包与签名 → 拖入CEAPP项目根目录 → 打包并签名`
+## Build the useful core
 
-## Defaults
+1. Copy `assets/starter/` for a new project.
+2. Replace every starter identity consistently:
+   - directory name
+   - `app.json` `appId`, names, descriptions, and version
+   - JavaScript `APP_ID`
+   - Data Bridge collection names and database filename
+   - icon and visible product copy
+3. Keep `appId` stable after users have data. Changing it creates a different app/data identity.
+4. Keep the CEAPP version independent from the CanEngine host version.
+5. Implement one complete local workflow before optional bridges. Include its empty, loading, success, and error states.
+6. Keep the first screen useful without remote CSS, JavaScript, fonts, icons, or content.
 
-Unless the user explicitly asks otherwise, build with these assumptions:
+The starter intentionally declares only app-private Data Bridge read/write access. Remove Data Bridge if the product does not persist data. Do not retain sample features or permissions that the final product does not use.
 
-- The output is a CEAPP source project, not a pre-signed final package.
-- The app works offline after install.
-- The first screen does not depend on any CDN asset.
-- The project supports both `zh-CN` and `en-US`.
-- When hosted inside CanEngine, the app follows the platform locale automatically.
-- When opened outside CanEngine, the app falls back to its own saved locale or `navigator.language`.
-- Static assets stay inside the project directory.
-- The project root is clean enough to be dragged into CanEngine for packaging.
+## Add capabilities on demand
 
-## First Choice
+Read `references/manifest-and-host-bridge.md` before changing `app.json` or calling `window.CanEngine`.
 
-Pick the lightest runtime that fits:
+For every capability added:
 
-- Prefer `assets/starter/` for simple tools, utilities, demos, and operator workflows.
-- The current `assets/starter/` already includes minimal AI Bridge and Notification Bridge examples that can be trimmed down or expanded.
-- Use a bundled framework build only when the UI really needs React, Vue, or another frontend stack.
-- If a framework is used, the shipped `index.html`, CSS, JS, icons, images, and fonts must all be local files.
+1. Add the exact `capabilities` metadata when the schema requires it.
+2. Add only the matching flat permission strings.
+3. Detect the method before calling it.
+4. Provide a useful unavailable/error state.
+5. Add one visible operation that verifies the integration.
+6. Remove the capability and permission if the final UI never calls it.
 
-## Read These References
+Additional routing:
 
-- `references/bilingual-framework.md`: locale flow, message tables, and bilingual structure
-- `references/offline-runtime.md`: offline packaging hygiene and asset expectations
-- `references/manifest-and-host-bridge.md`: `app.json` and `window.CanEngine` bridge usage
-- `references/phone-bridge.md`: public-safe Phone Bridge usage for CEAPP source projects
-- `references/packaging-and-signing.md`: how generated projects are packaged and signed by CanEngine
+- Read `references/phone-bridge.md` only when accepting or sending Phone Bridge files.
+- Read `references/bilingual-framework.md` before changing locale structure or user-facing copy.
+- Read `references/offline-runtime.md` when adding remote APIs, frameworks, fonts, or runtime dependencies.
 
-## Workflow
+## Follow the standard interaction patterns
 
-1. Start from `assets/starter/` or mirror its structure.
-2. Keep the first runnable version dependency-light.
-3. Put user-facing strings in a central message table.
-4. Use `nameI18n` and `descriptionI18n` in `app.json` so the CanEngine app list localizes correctly.
-5. When running inside CanEngine, use the host bridge locale API:
-   - `getLocale()`
-   - `onLocaleChange(handler)`
-   - `setLocale(locale)` only when the app is intentionally changing the host language
-6. For local media assets, prefer:
-   - `assetURL(appId, path)` for `<img>`, `<audio>`, and `<video>`
-   - `assetDataURL(appId, path)` for small inline or copy workflows
-7. For file inputs, support normal picker flow first and add drag/drop or clipboard when the task benefits from it.
-8. When the app needs notifications, keep the creation flow in the app:
-   - declare flat `permissions` strings such as `notification.send` and `notification.schedule`
-   - optionally add `capabilities.notification` metadata for display copy
-   - create, re-enable, update, and delete features only through `window.CanEngine.notification.*`
-   - treat Notification Bridge settings as bridge-side governance rather than an authoring surface
-9. Keep the CEAPP source root clean and self-contained.
-10. If the app needs phone-to-desktop intake, prefer the system `window.CanEngine.phoneBridge` APIs instead of inventing a custom LAN upload server inside the CEAPP.
-11. Do not create official, KOL, or trusted signatures in the skill output.
+- Resolve the bridge lazily from `window.CanEngine` or `window.parent.CanEngine`.
+- Treat CanEngine locale as the source of truth. Do not add an app-level locale switch to an ordinary app.
+- Keep all user-facing text in both `zh-CN` and `en-US` message tables.
+- Load package images/audio/video with `assetURL(appId, path)`; use relative URLs only as browser fallback.
+- Use `assetDataURL` only for small inline or copy-only cases.
+- Preview browser `File`/`Blob` objects with `URL.createObjectURL` and revoke old URLs.
+- Stage in-memory files with `stageFile({ appId, name, dataBase64, mime })`.
+- Stage host-native drops with `stageFile({ appId, sourcePath })`.
+- Normalize picker, browser drop, paste, native drop, and Phone Bridge input before business logic.
+- Use `data.local(collection).get/find/put/delete` for app-private persistence; use `localStorage` only as a browser-debug fallback or an explicitly designed cache.
+- Never request API keys inside a CEAPP. AI provider configuration stays in CanEngine.
 
-## Rules
+## Keep the project root clean
 
-- Never ship a CEAPP source project whose first screen depends on remote CSS or JS.
-- Never use `cdn.tailwindcss.com`, remote React UMD bundles, remote icon fonts, or remote Google Fonts in the shipped project.
-- Bundle fonts locally when needed.
-- Keep locale names stable: `zh-CN` and `en-US`.
-- Do not tie CEAPP app versions to the CanEngine host version.
-- Prefer simple static HTML/CSS/JS when that is enough.
-- Keep `window.CanEngine` integration graceful: the app should still be debuggable in a normal browser when practical.
-- Do not include private keys, signing secrets, official key IDs, KOL key IDs, or default trusted publisher credentials in generated projects.
-- Do not embed private local IPs, hard-coded session tokens, raw filesystem paths, or internal-only debugging endpoints in public CEAPP source.
-- Do not describe self-signing as official certification or security review.
+Package only runtime files:
 
-## Packaging Handoff
+```text
+my-app/
+├── app.json
+├── index.html
+├── app.js
+├── styles.css
+├── assets/
+│   ├── ceapp-i18n.js
+│   └── logo.png
+├── data/                 # only when a local schema is declared
+│   └── localdb.schema.json
+└── scripts/              # only when a declared command needs them
+```
 
-After app changes:
+Do not package design sources, archives, screenshots, old builds, private notes, `.env` files, or unrelated docs.
 
-1. Update the CEAPP source directory.
-2. Rebuild any local frontend bundle if the app uses one.
-3. Validate that the project root contains the required files, especially `app.json` and `index.html`.
-4. Open CanEngine and go to `我的 → 开发者身份 / CEAPP打包与签名`.
-5. Drag the CEAPP project root folder into the packaging area.
-6. Let CanEngine package and sign it using the current authorized identity.
+## Validate before handoff
 
-Expected label behavior after CanEngine signing:
+Run the bundled public-source validator:
 
-- Official signer: green `官方` label.
-- KOL signer: blue KOL display-name label, such as `仙人掌`.
-- Normal local signer: yellow user-name label, such as `王灿`, indicating self-signed / lower trust.
-- Unsigned package: gray `未签名` label.
-- Invalid signature: red `签名无效` label.
+```bash
+python3 scripts/validate_ceapp.py /path/to/ceapp-project
+```
 
-The labels are for source identification and risk signaling only. They are not a security audit of the app logic.
+Then verify manually:
+
+1. The useful core works in a normal browser.
+2. The app launches inside CanEngine with no blank first screen.
+3. Host locale changes rerender visible copy.
+4. Package media loads through `assetURL`.
+5. Every permission maps to code and a user-visible feature.
+6. Optional bridges fail gracefully when disabled or denied.
+7. Keyboard focus, labels, empty states, and reduced motion are usable.
+8. No secret, personal path, private network detail, session URL, or internal endpoint is present.
+9. `app.json` and JavaScript use the same `appId`.
+10. The final project folder contains only files required at runtime.
+
+Fix validation failures before packaging. Treat warnings as review prompts; do not silence them without checking the source.
+
+## Packaging handoff
+
+Hand the clean project root to CanEngine:
+
+`CanEngine → 我的 → 开发者身份 / CEAPP打包与签名 → 选择或拖入项目根目录 → 检查 → 打包并签名`
+
+Describe a signature as source/integrity metadata, not a security audit. Current public packaging accepts a CEAPP project root; do not tell users that this flow re-signs an existing `.ceapp`.

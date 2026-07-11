@@ -1,36 +1,43 @@
-# Manifest And Host Bridge
+# Manifest and Host Bridge
 
-## Preferred App Layout (Current CanEngine)
+Use this reference when editing `app.json` or calling `window.CanEngine`. It reflects the CanEngine 1.5.9 host contract while keeping the CEAPP's own version lifecycle independent.
 
-For new nontrivial apps, prefer:
+## Contents
+
+1. Project layout
+2. Manifest baseline
+3. Capability and permission recipes
+4. Bridge access and browser fallback
+5. Package assets
+6. File input and staging
+7. App-private data
+8. Jobs, results, and runtime
+9. Diagnostics, locale, print, and clipboard
+10. Optional bridge surfaces
+11. Final consistency checklist
+
+## 1. Project layout
+
+Use a self-contained project root:
 
 ```text
-Apps/MyApp/
-├── ceapp/
-│   ├── app.json
-│   ├── index.html
-│   ├── app.js
-│   ├── styles.css
-│   ├── assets/
-│   │   ├── ceapp-i18n.js
-│   │   └── logo.png
-│   └── scripts/
-│       └── backend_or_cli_if_needed
-└── README.md
-```
-
-Legacy apps may keep a flatter layout:
-
-```text
-Apps/MyLegacyApp/
+my-app/
 ├── app.json
 ├── index.html
-├── ...
+├── app.js
+├── styles.css
+├── assets/
+│   ├── ceapp-i18n.js
+│   └── logo.png
+├── data/
+│   └── localdb.schema.json   # only for declared local Data Bridge
+└── scripts/
+    └── worker.py             # only for declared commands
 ```
 
-When updating an existing app, prefer staying consistent with the local pattern unless the task is explicitly about restructuring it.
+Keep source-only docs, design files, archives, old builds, secrets, and caches outside the package root.
 
-## Manifest Baseline
+## 2. Manifest baseline
 
 ```json
 {
@@ -42,305 +49,136 @@ When updating an existing app, prefer staying consistent with the local pattern 
     "en-US": "My App"
   },
   "version": "1.0.0",
-  "description": "Short app description.",
+  "description": "A short product description.",
   "descriptionI18n": {
-    "zh-CN": "简短应用说明。",
-    "en-US": "Short app description."
+    "zh-CN": "简短的产品说明。",
+    "en-US": "A short product description."
   },
   "entry": "index.html",
   "icon": "assets/logo.png",
-  "minCanEngineVersion": "1.4.1",
+  "minCanEngineVersion": "1.5.8",
   "platforms": [{ "os": "*", "arch": "*" }],
-  "runtime": {
-    "requirements": [
-      { "id": "base-runtime" }
-    ]
-  },
   "commands": {
     "noop": {
       "executable": "echo",
-      "baseArgs": ["my-app"]
-    }
-  },
-  "capabilities": {
-    "ai": {
-      "required": false,
-      "features": []
+      "baseArgs": ["my-app"],
+      "allowedFlags": []
     }
   },
   "permissions": []
 }
 ```
 
-## Command Requirement (Current Packer)
+Current validation rules that commonly fail:
 
-The current CanEngine packer rejects an `app.json` with an empty `commands` object.
+- `schemaVersion` must be `1`.
+- `appId` must be 2-64 lowercase letters, digits, hyphens, underscores, or dots.
+- `entry`, icon, schema, scripts, and database filenames must be package-relative.
+- `commands` must contain at least one command. Keep an inert `noop` only for pure UI apps and never wire it to the UI.
+- Every command needs an executable. Treat `allowedFlags` as a strict allowlist.
+- AI, Data Bridge, and Notification Bridge capability metadata must have matching flat permissions.
+- A CEAPP's `version` is not the CanEngine host version. Increment it when distributing an update.
+- Changing `appId` changes app identity and app-private data identity.
 
-For a pure UI app that does not truly run a backend task, declare a minimal inert command:
+## 3. Capability and permission recipes
 
-```json
-"commands": {
-  "noop": {
-    "executable": "echo",
-    "baseArgs": ["my-app"]
-  }
-}
-```
+Start with no optional capability. Add one recipe only when the app has a user-visible feature that calls it.
 
-Rules:
-
-- Use a stable app-specific token in `baseArgs`.
-- Do not wire the UI to the dummy command.
-- Replace the dummy command with a real one as soon as the app genuinely needs host-run execution.
-
-## Data Bridge Manifest Additions
-
-CanEngine keeps the existing `permissions: string[]` contract and adds Data Bridge as a compatible capability extension.
-
-Recommended MVP shape:
+### App-private local data
 
 ```json
 {
   "capabilities": {
     "dataBridge": {
-      "required": true,
-      "datasets": ["students_dataset"],
-      "actions": ["list_by_grade"],
-      "mode": "read"
+      "required": false,
+      "local": {
+        "enabled": true,
+        "dbFile": "my-app.sqlite",
+        "schemaEntry": "data/localdb.schema.json",
+        "schemaVersion": 1
+      }
     }
   },
-  "permissions": [
-    "data.read",
-    "data.write",
-    "data.action",
-    "data.schema"
-  ]
+  "permissions": ["data.read", "data.write"]
 }
 ```
 
-Rules:
-
-- `datasets` lists shared dataset IDs the app expects to read.
-- `actions` lists shared action IDs the app may invoke.
-- `mode` should stay conservative for MVP. Prefer `read` unless the app truly needs export-style behavior.
-- `data.write` is for the app's own local store only; it does not grant shared dataset writes.
-- Do not invent wildcard dataset IDs or action IDs in app manifests. Declare exact resource IDs.
-
-## Notification Bridge Manifest Additions
-
-CanEngine keeps Notification Bridge aligned with the existing flat `permissions: string[]` manifest contract.
-
-Recommended shape:
+Minimal schema:
 
 ```json
 {
-  "minCanEngineVersion": "1.5.0",
+  "collections": ["notes"]
+}
+```
+
+Remove `data.write` for a genuinely read-only local feature. Do not put `data.local` in permissions; it is an API name, not a permission.
+
+### Shared dataset or action
+
+```json
+{
+  "capabilities": {
+    "dataBridge": {
+      "required": false,
+      "datasets": ["declared_dataset_id"],
+      "actions": ["declared_action_id"],
+      "mode": "read"
+    }
+  },
+  "permissions": ["data.read", "data.action"]
+}
+```
+
+Declare exact resource IDs supplied for the product. Do not invent wildcard datasets/actions or expose direct SQL and database credentials.
+
+### AI text generation
+
+```json
+{
+  "capabilities": {
+    "ai": {
+      "required": false,
+      "features": ["ai.text.generate"]
+    }
+  },
+  "permissions": ["ai.text.generate"]
+}
+```
+
+Supported feature permissions include:
+
+- `ai.text.generate`
+- `ai.vision.analyze`
+- `ai.image.generate`
+- `ai.model3d.generate`
+- `ai.video.generate`
+
+Declare only features the UI calls. Keep `required: false` when the useful core can work without AI.
+
+### Immediate notification
+
+```json
+{
   "capabilities": {
     "notification": {
       "required": false,
-      "reason": "Explain why the app needs to notify the user.",
-      "capabilities": ["send", "schedule"]
+      "reason": "Notify the user after an explicit long-running export.",
+      "capabilities": ["send"]
     }
   },
-  "permissions": [
-    "notification.send",
-    "notification.schedule"
-  ]
+  "permissions": ["notification.send"]
 }
 ```
 
-Rules:
+Add `schedule` and `notification.schedule` only when the app registers a persistent schedule/event feature.
 
-- `notification.send` is for runtime immediate notifications initiated by the app.
-- `notification.schedule` is for persisted registered features such as schedule, app event, or system event notifications.
-- `capabilities.notification` is optional metadata for display copy; permission checks still use the flat `permissions` array.
-- Only request the capabilities the app actually needs. A runtime-only app may declare just `notification.send`.
-- Feature creation belongs to the app or system module. Notification Bridge is governance and routing, not a bridge-side feature authoring surface.
+### Phone Bridge
 
-## Data Bridge JS Surface
+Phone Bridge uses flat permissions without a `capabilities.phoneBridge` block. Read `phone-bridge.md` and declare only called methods.
 
-Current CEAPP-facing Data Bridge APIs are exposed on `window.CanEngine.data`:
+## 4. Bridge access and browser fallback
 
-```js
-const bridge = window.CanEngine || (window.parent && window.parent.CanEngine)
-
-await bridge.data.local('notes').put({ id: 'note-1', title: 'Hello' })
-const localRows = await bridge.data.local('notes').find({ limit: 20 })
-
-const sharedRows = await bridge.data.dataset('students_dataset').find({
-  where: { grade: 'A' },
-  limit: 10,
-  sort: [{ field: 'name', direction: 'asc' }]
-})
-
-const schema = await bridge.data.schema('students_dataset')
-
-const actionRows = await bridge.data.action('list_by_grade', {
-  grade: 'A'
-})
-```
-
-MVP behavior:
-
-- `data.local(collection)` is app-private and stored in the calling app's own local SQLite space.
-- `data.dataset(datasetId).find(...)` only supports basic filtering, sorting, and pagination.
-- `data.schema(datasetId)` returns the declared dataset columns from the host-managed dataset store.
-- `data.action(actionId, params)` is the only supported path for complex shared queries.
-- Shared dataset and action access will trigger a host permission prompt on first use.
-
-Do not document or depend on:
-
-- host filesystem absolute paths
-- real source credentials
-- internal localhost debug endpoints
-- direct SQL access from CEAPP into shared databases
-
-## Icon Notes
-
-- `icon` should be a package-relative path.
-- Prefer `assets/logo.png` as the default convention.
-- Prefer PNG with square dimensions and clean small-size readability.
-- Do not use remote URLs, absolute paths, or machine-specific paths.
-- Even if the current host falls back to a default icon in some surfaces, ship a real app logo in the package.
-
-If the app has an internal page header that should visually match the icon shown in the CanEngine app list, prefer the host-injected icon first:
-
-```js
-const APP_ICON_SRC = window.__CANENGINE_APP_ICON__ || 'assets/logo.png'
-```
-
-This avoids image-path surprises inside the injected launch surface while keeping a local package fallback.
-
-## Local Asset Loading Strategy
-
-Hosted ceapps do not behave exactly like a plain `file://` browser page.
-
-Current launch model:
-
-- the host reads and prepares the app HTML
-- scripts and styles may be inlined or rewritten before launch
-- images referenced later by HTML or CSS still depend on webview file-loading behavior
-
-That means:
-
-- `img src="assets/logo.png"` may look fine in Chrome
-- the same path may fail, appear inconsistently, or be blocked inside the hosted CanEngine webview
-
-Treat local assets in four buckets:
-
-### 1. Plain relative assets
-
-Use for:
-
-- noncritical decorative images
-- assets whose failure does not break the user’s understanding
-
-Examples:
-
-- secondary illustrations
-- optional decorative textures
-- nonessential empty-state decoration
-
-### 2. Host-served package assets
-
-Use for:
-
-- package-local images, audio, and video rendered inside CanEngine
-- large media files that should not be converted to base64 strings
-- critical UI images whose failure would make the app look broken
-
-Recommended form:
-
-```js
-const bridge = window.CanEngine || (window.parent && window.parent.CanEngine)
-
-const imageURL = await bridge.assetURL('my-app', 'assets/demo.png')
-document.querySelector('img').src = imageURL
-
-audio.src = await bridge.assetURL('my-app', 'assets/demo.mp3')
-audio.load()
-
-video.src = await bridge.assetURL('my-app', 'assets/demo.mp4')
-video.poster = await bridge.assetURL('my-app', 'assets/poster.png')
-video.load()
-```
-
-Fallback for direct browser debugging:
-
-```js
-async function packagedAsset(appId, assetPath) {
-  const bridge = window.CanEngine || (window.parent && window.parent.CanEngine)
-  if (bridge?.assetURL) return bridge.assetURL(appId, assetPath)
-  return new URL(assetPath, document.baseURI).toString()
-}
-```
-
-### 3. Inline critical assets
-
-Use for:
-
-- small images that must always appear
-- first-screen branding
-- critical status art
-
-Recommended forms:
-
-- data URL
-- build-time inlined asset string
-- `assetDataURL(appId, assetPath)` for small inline/copy-only cases
-
-Do not use `assetDataURL` for large images, audio, or video by default. It duplicates the whole file into JS memory as a base64 string.
-
-### 4. Host-injected assets
-
-Use for:
-
-- app header logos that should match the CanEngine app list
-- any image the host already knows how to provide safely
-
-Current built-in example:
-
-```js
-const APP_ICON_SRC = window.__CANENGINE_APP_ICON__ || 'assets/logo.png'
-```
-
-## Critical Image Rule
-
-If an image failing to load would make the app look broken, confusing, or untrustworthy, do **not** rely only on:
-
-- `img src="assets/..."`
-- `background-image: url('assets/...')`
-
-Prefer, in order:
-
-1. host-injected source
-2. `assetURL(appId, assetPath)`
-3. `assetDataURL(appId, assetPath)` only for small inline/copy cases
-4. plain relative path only for noncritical assets
-
-Good examples of critical images:
-
-- header logos
-- loading / status illustrations
-- must-show action icons
-- first-view hero or brand image
-- any image used to communicate completion, failure, or identity
-
-## Host Bridge Usage
-
-The app may access the host bridge from:
-
-```js
-window.CanEngine || (window.parent && window.parent.CanEngine)
-```
-
-The bridge is the authoritative ceapp-to-host contract. If a capability is not available on `window.CanEngine`, do not assume the app can reach it just because it exists somewhere in Wails or Go.
-
-### Browser-First Development Contract
-
-Most ceapps are first debugged in a normal browser and only later loaded into CanEngine. Design for that from day one:
-
-- Always resolve the bridge lazily:
+Resolve the bridge lazily:
 
 ```js
 function getBridge() {
@@ -348,172 +186,256 @@ function getBridge() {
 }
 ```
 
-- Every bridge use must be optional:
-  - if bridge exists, use host capability
-  - if bridge is missing, use a browser fallback or a degraded but nonbroken local path
-- Do not call `window.runtime.*` directly from ceapp code.
-  - `window.runtime.*` belongs to the outer Wails host shell, not to the ceapp contract.
-  - If the app needs a new host feature, add it to `window.CanEngine` in the host and document it here.
+Rules:
 
-### Current Bridge Surface (Exhaustive)
+- Use only methods exposed on `window.CanEngine`; never call outer Wails internals such as `window.runtime`.
+- Detect an optional method immediately before use.
+- Keep the local shell functional when the bridge is absent.
+- Use a browser fallback only when it preserves the same product meaning.
+- Show unavailable, denied, loading, success, and error states instead of hiding failures.
+- Do not expose raw response objects when they contain paths, tokens, URLs, file content, or credentials.
 
-These are the methods currently exposed to ceapps on `window.CanEngine`.
+Host discovery:
 
-#### File input and drag/drop
+```js
+const bridge = getBridge()
+const version = await bridge?.getHostVersion?.()
+const capabilities = await bridge?.getCapabilities?.()
+const hasPhoneBridge = await bridge?.hasCapability?.('phone.bridge')
+```
 
-- `stageFile(request: { appId: string, name?: string, dataBase64?: string, sourcePath?: string, mime?: string }) => Promise<StagedFile>`
-  - Use `dataBase64` when staging a file already held in browser memory.
-  - Use `sourcePath` when the host gives you a real OS file path, such as native file drop.
-  - When `sourcePath` is provided, the host can derive `name` automatically from the filename.
-- `getStagedFile(fileId: string) => Promise<StagedFile>`
-- `removeStagedFile(fileId: string) => Promise<{ ok: boolean }>`
-- `stageFileDialog(appId: string) => Promise<StagedFile>`
-- `stageFilesDialog(appId: string) => Promise<StagedFile[]>`
-- `chooseFile(options: { appId: string, title?: string, accept?: string[] }) => Promise<StagedFile | null>`
-- `chooseFiles(options: { appId: string, title?: string, accept?: string[] }) => Promise<StagedFile[]>`
-- `chooseDirectory(options?: { title?: string, defaultPath?: string }) => Promise<ChosenDirectory | null>`
-- `onFileDrop(handler: ({ x: number, y: number, paths: string[] }) => void) => unsubscribe`
-  - This is the host-native file-drop bridge for dragging files from Finder / Explorer into CanEngine.
-  - In hosted ceapps, OS file drag into the inner iframe may not reliably reach inner DOM `drop` listeners.
-  - Prefer `onFileDrop(...)` for desktop file-drop workflows, then stage each `sourcePath` with `stageFile({ appId, sourcePath })`.
+`getHostVersion()` returns an object with `hostVersion`, `apiVersion`, and `platform`.
 
-#### Packaged assets
+## 5. Package assets
 
-- `assetURL(appId: string, assetPath: string) => Promise<string>`
-  - Preferred for assigning package-local image/audio/video URLs to `src` or `poster`.
-  - Does not base64-copy the whole media file into JS memory.
-- `assetDataURL(appId: string, assetPath: string) => Promise<string>`
-  - Use only for small inline assets, clipboard/copy flows, or cases that require a `data:` URL.
+Use `assetURL` for normal package image/audio/video rendering:
 
-#### Jobs and long-running work
+```js
+async function packageAsset(path) {
+  const bridge = getBridge()
+  if (bridge?.assetURL) {
+    try {
+      return await bridge.assetURL(APP_ID, path)
+    } catch {
+      // Fall through to standalone-browser debugging.
+    }
+  }
+  return new URL(path, document.baseURI).toString()
+}
 
-- `runJob(request: { appId: string, commandId: string, args?: string[], inputFileIds?: string[], mode?: string }) => Promise<JobInfo>`
-- `getJob(jobId: string) => Promise<JobInfo>`
-- `listJobs(filter?: { appId?: string, status?: string, limit?: number }) => Promise<JobInfo[]>`
-- `getJobLogs(jobId: string) => Promise<JobLogs>`
-- `cancelJob(jobId: string) => Promise<void>`
-- `onEvent(name: string, handler: (payload: any) => void) => unsubscribe`
-  - Use this for host event streams such as job updates.
-  - Current job event names include both legacy and new forms:
-    - `job:started`, `job:log`, `job:completed`, `job:failed`, `job:cancelled`
-    - `job.started`, `job.stdout`, `job.stderr`, `job.file`, `job.completed`, `job.failed`, `job.cancelled`
+image.src = await packageAsset('assets/example.png')
+audio.src = await packageAsset('assets/example.mp3')
+video.src = await packageAsset('assets/example.mp4')
+video.poster = await packageAsset('assets/poster.png')
+```
 
-#### Results and output handling
+Use `assetDataURL(appId, path)` only when a small inline/copy workflow specifically requires a data URL. Large media in a data URL duplicates bytes in memory.
 
-- `exportFile(input: { jobId?: string, fileRef?: string, sourcePath?: string, suggestedName?: string, targetDirectoryId?: string }) => Promise<ExportedFile>`
-- `openFile(input: { jobId?: string, fileRef?: string, sourcePath?: string }) => Promise<{ ok: boolean }>`
-- `revealFile(input: { jobId?: string, fileRef?: string, sourcePath?: string }) => Promise<{ ok: boolean }>`
-- `resultDataURL(path: string) => Promise<string>`
-  - Reads a staged or result file and returns a `data:` URL.
-- `saveAs(path: string) => Promise<string>`
-  - Opens the host save dialog for an existing staged/result path and returns the saved target path.
-- `saveImageDataURL(defaultFilename: string, dataURL: string) => Promise<string>`
-  - Host-native “save generated image bytes” helper for in-memory image output.
-- `copyResult(path: string) => Promise<void>`
-- `copyImageDataURL(dataURL: string) => Promise<void>`
-- `openResult(path: string) => Promise<void>`
-- `revealResult(path: string) => Promise<void>`
+Package-relative paths remain useful as the standalone-browser fallback, but a critical hosted image should not rely on a plain relative URL alone.
 
-Prefer `exportFile`, `openFile`, and `revealFile` whenever the file comes from a host-managed job result. Use raw path helpers only for compatibility or browser-first fallbacks.
+## 6. File input and staging
 
-#### Runtime and environment management
+Treat these as separate inputs that converge on shared business logic:
 
-- `getHostVersion() => Promise<{ hostVersion: string, apiVersion: string, platform: string }>`
-- `getCapabilities() => Promise<{ hostVersion: string, apiVersion: string, platform: string, capabilities: HostCapability[] }>`
-- `hasCapability(capabilityId: string) => Promise<boolean>`
-- `getRuntimeStatus() => Promise<{ ok: boolean, runtimes: RuntimeInfo[] }>`
-- `requireRuntime(runtimeId: string) => Promise<{ id: string, ok: boolean, runtime: RuntimeInfo, message?: string }>`
-- `listRuntimes() => Promise<PlatformRuntime[]>`
-- `checkRuntimes(runtimeIds: string[]) => Promise<PlatformRuntime[]>`
-- `installRuntime(runtimeId: string) => Promise<RuntimeInstallResult>`
-- `getAppRuntimeStatus(appId: string) => Promise<AppRuntimeStatusResult>`
-- `envCheck(appId: string) => Promise<EnvCheckResult>`
-- `envInstall(appId: string, dependencyId: string) => Promise<EnvInstallResult>`
+- browser picker: `input.files`
+- browser drop: `event.dataTransfer.files`
+- clipboard paste: `ClipboardEvent.clipboardData.items`
+- native desktop drop: `onFileDrop`
+- host dialog: `stageFileDialog` or `chooseFile`
+- Phone Bridge: descriptor followed by `readFile(fileId)`
 
-For new CEAPP work, prefer `getHostVersion`, `getCapabilities`, `hasCapability`, `getRuntimeStatus`, and `requireRuntime` for host discovery. Keep `listRuntimes`, `getAppRuntimeStatus`, and `envCheck` only when you need legacy compatibility or installer UX.
+### Browser File
 
-#### Diagnostics
+Preview with an object URL and revoke it when replaced:
 
-- `getDiagnostics(appId: string) => Promise<Diagnostics>`
-- `copyDiagnostics(appId: string) => Promise<{ ok: boolean }>`
-- `exportDiagnostics(appId: string) => Promise<ExportedFile>`
+```js
+let previewURL = ''
 
-#### Host-injected globals
+function previewFile(file) {
+  if (previewURL) URL.revokeObjectURL(previewURL)
+  previewURL = URL.createObjectURL(file)
+  image.src = previewURL
+}
+```
 
-- `window.__CANENGINE_APP_ICON__`
-  - The host-injected app-list icon as a data URL or host-safe image source.
-  - Prefer this value for in-app header logos when you want exact visual alignment with the CanEngine app list.
+### Stage in-memory bytes
 
-#### Locale sync
+`stageFile` accepts `dataBase64`, not a raw `File` field. Use a data URL only for the staging request; keep object URLs for normal preview.
 
-- `getLocale() => string | Promise<string>`
-- `setLocale(locale: string) => string | Promise<string>`
-- `onLocaleChange(handler: (locale: string) => void) => unsubscribe`
+```js
+function readAsDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onerror = () => reject(reader.error)
+    reader.onload = () => resolve(String(reader.result || ''))
+    reader.readAsDataURL(file)
+  })
+}
 
-#### AI Bridge (CanEngine 1.4.1+)
+const staged = await bridge.stageFile({
+  appId: APP_ID,
+  name: file.name,
+  dataBase64: await readAsDataURL(file),
+  mime: file.type
+})
+```
 
-AI Bridge is exposed under `window.CanEngine.ai`. API Keys, provider routes, Base URLs, user authorization, limits, and usage logs stay in the host. A ceapp only declares capabilities and sends task input.
+### Native desktop drop
 
-- `ai.getStatus() => Promise<AIBridgeStatus>`
-- `ai.text.generate(request: TextGenerateRequest) => Promise<TextGenerateResponse>`
-- `ai.vision.analyze(request: VisionAnalyzeRequest) => Promise<VisionAnalyzeResponse>`
-- `ai.image.generate(request: ImageGenerateRequest) => Promise<ImageGenerateResponse>`
-- `ai.model3d.generate(request: Model3DGenerateRequest) => Promise<Model3DTask>`
-- `ai.model3d.getTask(taskId: string) => Promise<Model3DTaskStatus>`
-- `ai.model3d.cancelTask(taskId: string) => Promise<void>`
-- `ai.video.create(request: VideoCreateRequest) => Promise<VideoTask>`
-- `ai.video.getTask(taskId: string) => Promise<VideoTaskStatus>`
-- `ai.video.cancelTask(taskId: string) => Promise<void>`
+```js
+const unsubscribe = bridge.onFileDrop(async ({ paths = [] }) => {
+  for (const sourcePath of paths) {
+    const staged = await bridge.stageFile({ appId: APP_ID, sourcePath })
+    await handleStagedFile(staged, 'host-native-drop')
+  }
+})
+```
 
-Manifest requirements:
+Never show `sourcePath` in normal UI or copied diagnostics. Browser DOM drop remains the standalone fallback because native drag into an embedded view may not reach the inner DOM reliably.
+
+Useful file methods:
+
+- `stageFile(request)`
+- `getStagedFile(fileId)`
+- `removeStagedFile(fileId)`
+- `stageFileDialog(appId)` / `stageFilesDialog(appId)`
+- `chooseFile(options)` / `chooseFiles(options)`
+- `chooseDirectory(options)`
+- `onFileDrop(handler)`
+
+## 7. App-private data
+
+The current local collection surface is exactly:
+
+```js
+const notes = bridge.data.local('notes')
+
+await notes.put({ id: 'note-1', title: 'Hello', createdAt: new Date().toISOString() })
+const one = await notes.get('note-1')
+const result = await notes.find({ limit: 50 })
+await notes.delete('note-1')
+```
+
+`find` returns `{ ok, rows, count }`. Persist app records without absolute paths or credentials. If migrating older `localStorage` data, delete the old value only after every Data Bridge write succeeds.
+
+Shared data uses:
+
+```js
+const result = await bridge.data.dataset('declared_dataset_id').find({
+  where: { status: 'active' },
+  sort: [{ field: 'updated_at', direction: 'desc' }],
+  limit: 20
+})
+
+const schema = await bridge.data.schema('declared_dataset_id')
+const actionResult = await bridge.data.action('declared_action_id', { status: 'active' })
+```
+
+Use a declared action for complex shared queries. Do not connect a CEAPP directly to a shared database.
+
+## 8. Jobs, results, and runtime
+
+Declare a real command and its runtime only when the product needs host-run work:
 
 ```json
-"minCanEngineVersion": "1.4.1",
-"capabilities": {
-  "ai": {
-    "required": false,
-    "features": [
-      "ai.text.generate",
-      "ai.vision.analyze",
-      "ai.image.generate",
-      "ai.model3d.generate",
-      "ai.video.generate"
-    ]
+{
+  "runtime": {
+    "requirements": [{ "id": "python-runtime", "optional": true }]
+  },
+  "commands": {
+    "process": {
+      "executable": "python3",
+      "baseArgs": ["scripts/process.py"],
+      "allowedFlags": ["--mode"]
+    }
   }
-},
-"permissions": [
-  "ai.text.generate",
-  "ai.vision.analyze",
-  "ai.image.generate",
-  "ai.model3d.generate",
-  "ai.video.generate"
-]
+}
 ```
 
-Use `required: false` unless the app cannot provide any useful experience without AI.
-
-Do not ask for API Keys inside a ceapp. If a call fails with `AI_BRIDGE_NOT_CONFIGURED`, `AI_FEATURE_DISABLED`, or `AI_PERMISSION_DENIED`, show a friendly degraded state and tell the user to configure or authorize AI Bridge in CanEngine “我的”.
-
-Example text call:
+Prefer current runtime discovery:
 
 ```js
-const bridge = window.CanEngine || (window.parent && window.parent.CanEngine)
+const runtime = await bridge.requireRuntime('python-runtime')
+if (!runtime.ok) showRuntimeUnavailable(runtime.message)
+```
+
+Run a job with staged file IDs:
+
+```js
+const job = await bridge.runJob({
+  appId: APP_ID,
+  commandId: 'process',
+  inputFileIds: [staged.id],
+  args: ['--mode', 'fast']
+})
+```
+
+Job methods:
+
+- `runJob(request)`
+- `getJob(jobId)`
+- `listJobs(filter)`
+- `getJobLogs(jobId)`
+- `cancelJob(jobId)`
+- `onEvent(name, handler)`
+
+Prefer managed result references:
+
+- `exportFile({ jobId, fileRef, suggestedName })`
+- `openFile({ jobId, fileRef })`
+- `revealFile({ jobId, fileRef })`
+
+Path-based result helpers exist for compatibility, but paths should not become the public app contract or appear in shareable logs.
+
+## 9. Diagnostics, locale, print, and clipboard
+
+Diagnostics:
+
+- `getDiagnostics(appId)`
+- `copyDiagnostics(appId)`
+- `exportDiagnostics(appId)`
+
+Prefer a small app-owned diagnostic summary containing app version, host version, capability booleans, locale, and permission names. Remove path-, token-, URL-, content-, and byte-like fields before copying.
+
+Locale:
+
+- `getLocale()`
+- `onLocaleChange(handler)`
+- `setLocale(locale)` only for a demo/settings feature intended to change the platform language
+
+Use the bundled `ceapp-i18n.js` and keep both `zh-CN` and `en-US` message tables local.
+
+Print:
+
+```js
+await bridge.printHTML(completeHTMLDocument, { title: 'Report' })
+```
+
+Clipboard:
+
+```js
+await bridge.clipboard.writeText(text)
+await bridge.clipboard.writeImage(dataURL)
+```
+
+Use browser clipboard only as a fallback. Define whether a copy action copies text, image pixels, a file, or a result reference.
+
+## 10. Optional bridge surfaces
+
+AI Bridge:
+
+```js
 const response = await bridge.ai.text.generate({
-  messages: [{ role: 'user', content: 'Summarize this note.' }],
+  messages: [{ role: 'user', content: prompt }],
   maxTokens: 300
 })
-console.log(response.text)
 ```
 
-Example image input for vision:
+Provider keys, base URLs, limits, and authorization stay in CanEngine. Handle disabled, not configured, feature disabled, permission denied, timeout, and provider errors.
+
+Vision uses a staged temporary file rather than large base64 in the AI request:
 
 ```js
-const staged = await bridge.stageFile({
-  appId: 'my-app',
-  name: file.name,
-  dataBase64: await readFileAsDataURL(file)
-})
-
 const response = await bridge.ai.vision.analyze({
   prompt: 'Describe this image.',
   images: [{ type: 'temp-file', path: staged.path }],
@@ -521,396 +443,32 @@ const response = await bridge.ai.vision.analyze({
 })
 ```
 
-#### Notification Bridge (CanEngine 1.5.0+)
-
-Notification Bridge is exposed under `window.CanEngine.notification`.
-
-Current CEAPP-facing methods:
-
-- `notification.send(request) => Promise<NotificationSendResult>`
-- `notification.registerFeature(config) => Promise<NotificationFeatureView>`
-- `notification.updateFeature(featureId, patch) => Promise<NotificationFeatureView>`
-- `notification.removeFeature(featureId) => Promise<void>`
-- `notification.listOwnFeatures() => Promise<NotificationFeatureView[]>`
-- `notification.getStatus() => Promise<NotificationBridgeStatus>`
-- `notification.openSettings() => Promise<void>`
-
-Governance rules:
-
-- The CEAPP is the source of truth for whether a feature exists and whether the source-side switch is on.
-- A feature is only effective when source-side enabled, bridge-side enabled, global Notification Bridge enabled, and permission granted are all true.
-- If the app deletes a feature, the bridge record is removed.
-- If the bridge deletes a feature, the host keeps a tombstone so the app will not auto-restore it on next launch; the app must explicitly save or re-enable it again.
-
-Recommended direct runtime send example:
+Notification Bridge:
 
 ```js
-const bridge = window.CanEngine || (window.parent && window.parent.CanEngine)
-
-const result = await bridge.notification.send({
-  title: 'Build finished',
-  content: 'Your export is ready.',
+await bridge.notification.send({
+  title: 'Export complete',
+  content: 'Your result is ready.',
   level: 'info',
-  category: 'runtime'
-})
-
-console.log(result)
-```
-
-Recommended persistent feature registration example:
-
-```js
-const bridge = window.CanEngine || (window.parent && window.parent.CanEngine)
-
-await bridge.notification.registerFeature({
-  featureId: 'daily-brief',
-  name: 'Daily Brief',
-  triggerType: 'schedule',
-  entry: 'brief.daily',
-  schedule: {
-    type: 'interval',
-    everyMinutes: 60
-  },
-  level: 'info',
-  defaultChannels: ['local'],
-  sourceEnabled: true,
-  reactivate: true
+  category: 'export'
 })
 ```
 
-Update and delete examples:
-
-```js
-await bridge.notification.updateFeature('daily-brief', {
-  sourceEnabled: false
-})
-
-await bridge.notification.removeFeature('daily-brief')
-```
-
-Status inspection example:
-
-```js
-const status = await bridge.notification.getStatus()
-const features = await bridge.notification.listOwnFeatures()
-
-console.log(status, features)
-```
-
-Important current status values:
-
-- `active`
-- `disabled_by_app`
-- `disabled_by_bridge`
-- `disabled_globally`
-- `permission_revoked`
-- `deleted_by_app`
-- `deleted_by_bridge`
-- `engine_offline`
-
-### Current Data Shapes
-
-Important return/request shapes currently used by the bridge:
-
-```ts
-type StageFileRequest = {
-  appId: string
-  name?: string
-  dataBase64?: string
-  sourcePath?: string
-  mime?: string
-}
-
-type StagedFile = {
-  id: string
-  appId: string
-  name: string
-  path: string
-  size: number
-  mime?: string
-  sha256?: string
-  createdAt: string
-}
-
-type ChooseFileOptions = {
-  appId: string
-  title?: string
-  accept?: string[]
-}
-
-type ChosenDirectory = {
-  id: string
-  path: string
-  name: string
-  writable: boolean
-  createdAt: string
-}
-
-type JobRequest = {
-  appId: string
-  commandId: string
-  args?: string[]
-  inputFileIds?: string[]
-  mode?: string
-}
-
-type JobInfo = {
-  id: string
-  appId: string
-  commandId: string
-  ok: boolean
-  status: string
-  command?: string[]
-  cwd?: string
-  inputDir: string
-  outputDir: string
-  workDir?: string
-  resultJson?: string
-  error?: string
-  exitCode?: number
-  stdout?: string
-  stderr?: string
-  logs?: string[]
-  startedAt: string
-  endedAt?: string
-  durationMs?: number
-  files: ResultFile[]
-}
-
-type JobLogs = {
-  jobId: string
-  stdout: string
-  stderr: string
-  logs: string[]
-  exitCode?: number
-}
-
-type ResultFile = {
-  fileRef?: string
-  name: string
-  path: string
-  type: string
-  mime: string
-  size: number
-}
-
-type ExportFileInput = {
-  jobId?: string
-  fileRef?: string
-  sourcePath?: string
-  suggestedName?: string
-  targetDirectoryId?: string
-}
-
-type Diagnostics = {
-  app: any
-  host: any
-  capabilities: any
-  runtime: any
-  permissions: Array<{ id: string, granted: boolean }>
-  recentJobs: JobInfo[]
-  recentErrors: Array<{ time: string, message: string, stack?: string }>
-}
-
-type TextGenerateRequest = {
-  messages: Array<{ role: 'system' | 'user' | 'assistant', content: string }>
-  temperature?: number
-  maxTokens?: number
-  model?: string
-}
-
-type TextGenerateResponse = {
-  text: string
-  usage?: { inputTokens?: number, outputTokens?: number, totalTokens?: number }
-}
-
-type AIMediaInput = {
-  type?: 'temp-file' | 'ceapp-asset' | 'data-url'
-  path: string
-}
-
-type VisionAnalyzeRequest = {
-  prompt: string
-  images?: AIMediaInput[]
-  maxTokens?: number
-  model?: string
-}
-
-type ImageGenerateRequest = {
-  prompt: string
-  size?: string
-  count?: number
-  model?: string
-}
-```
-
-For runtime/environment responses, the important rule is:
-
-- do not invent fields
-- inspect the current local Go types if you need exact shape
-- when documenting app behavior, describe the fields you actually consume
-
-### Desktop Dragging Rule
-
-Treat browser DOM drag/drop and host-native file drop as two different paths:
-
-- Standalone browser path:
-  - HTML5 `dragover` / `drop`
-  - `event.dataTransfer.files`
-- Hosted CanEngine path:
-  - `bridge.onFileDrop(...)`
-  - `bridge.stageFile({ appId, sourcePath })`
-  - `bridge.resultDataURL(path)` when preview bytes are needed
-
-The safest pattern for file-drop tools is:
-
-1. keep DOM `drop` for standalone browser use
-2. add `bridge.onFileDrop(...)` for hosted desktop use
-3. normalize both paths into one shared `loadFile(...)` or `loadStagedFile(...)` flow
-
-For image inputs, also support paste when feasible:
-
-```js
-document.addEventListener('paste', async (event) => {
-  if (['INPUT', 'TEXTAREA'].includes(event.target?.tagName)) return
-  const files = Array.from(event.clipboardData?.items || [])
-    .filter((item) => item.kind === 'file' && item.type.startsWith('image/'))
-    .map((item) => item.getAsFile())
-    .filter(Boolean)
-  for (const file of files) {
-    event.preventDefault()
-    await handleImageFile(file)
-  }
-})
-```
-
-Do not assume the host currently provides:
-
-- bluetooth
-- wifi
-- geolocation
-- arbitrary sensor access
-- unrestricted shell execution
-
-## Platform Runtime Preference
-
-Prefer shared CanEngine runtimes for first-party apps instead of making each app manage its own installer UX.
-
-Current runtime ids:
-
-- `base-runtime`
-- `python-runtime`
-- `node-runtime`
-- `video-runtime`
-
-Recommended pattern:
-
-1. declare `runtime.requirements` in `app.json`
-2. gate UI with `getRuntimeStatus()` or `requireRuntime(runtimeId)`
-3. use `getAppRuntimeStatus(appId)` and `installRuntime(runtimeId)` only when you need host-managed install flows
-4. keep `environment.dependencies` only when you still need legacy `envCheck` / `envInstall` fallback support
-
-## Critical Interaction Guidance
-
-When writing a demo or app spec, explicitly document the path for:
-
-- dragging
-- copying text
-- copying images
-- copying GIFs or files
-- file input
-- file output
-
-For each interaction, say whether it is:
-
-- browser-only
-- host bridge
-- browser first with host fallback
-- host first with browser fallback
-
-If the app is expected to run inside CanEngine, prefer the path that survives embedded webview behavior instead of the path that merely works in a standalone Chrome tab.
-
-### Dragging
-
-- Do not assume HTML5 `dragstart` / `dataTransfer` is sufficient for key workflows.
-- Do not assume OS file drag from Finder / Explorer into a hosted iframe will behave like a normal browser tab.
-- For file-drop tools inside ceapps, treat `bridge.onFileDrop(...)` as the host-safe path and DOM `drop` as the standalone-browser fallback.
-- For toolbox-to-canvas or similar desktop-tool interactions, prefer self-managed pointer/mouse dragging when webview stability matters.
-
-### Copy Actions
-
-- Do not assume `navigator.clipboard.write()` is sufficient for image copy in the host.
-- Prefer the CanEngine host bridge for image, GIF, or file clipboard behavior when available.
-- Define exactly what each “Copy” action means:
-  - text
-  - command
-  - image pixels
-  - GIF as file clipboard item
-  - file path
-  - download link
-
-## Demo-To-ceapp Checklist
-
-Before turning a demo into a packaged ceapp, check:
-
-1. Are there any CDN or remote startup dependencies?
-2. Are there remote images in the critical workflow?
-3. Does drag/drop rely only on `dragstart` / `dataTransfer`?
-4. Does image copy rely only on browser clipboard APIs?
-5. Is there a host-bridge alternative for key desktop actions?
-6. Has the runtime strategy been chosen and documented?
-7. Is `commands` non-empty in `app.json`?
-8. Is the package source isolated from `demo/`, `OLD/`, archives, and design source?
-9. Do package-local media assets use `assetURL` rather than large `data:` URLs?
-10. Do image-upload surfaces support picker, native drop, browser drop, and paste where applicable?
-
-## Runtime Reality
-
-The app is not hosted inside a uniform bundled Chrome runtime today. It is hosted inside the CanEngine webview layer:
-
-- macOS: WKWebView / WebKit-family behavior
-- Windows: WebView2 / Chromium-family behavior
-
-So compatibility must be validated against the host path, not only a local browser tab.
-
-Locale bridge APIs commonly include:
-
-- `getLocale()`
-- `setLocale(locale)`
-- `onLocaleChange(handler)`
-
-## Locale Notes
-
-- Use the shared `ceapp-i18n.js` helper whenever possible.
-- The helper should survive standalone browser use and embedded CanEngine use.
-- Keep the helper local inside the app package.
-- If the app should follow the CanEngine platform locale, do not add a duplicate in-app locale toggle unless the user explicitly asks for one.
-
-## Permissions Notes
-
-`permissions` should be treated as a conservative declaration layer.
-
-- Declare only real needs.
-- Do not invent a permission unless the host is also updated to interpret and enforce it.
-- Do not assume a manifest permission gives access to native OS capabilities by itself.
-
-## Packaging Handoff Notes
-
-This open skill should produce a clean CEAPP source project directory. The final `.ceapp` container should be created by CanEngine, not by the skill.
-
-Recommended flow:
-
-1. Generate or update the CEAPP source project.
-2. Ensure the project root contains `app.json`, `index.html`, local CSS / JS, and needed `assets/`.
-3. Open CanEngine.
-4. Go to `我的 → 开发者身份 / CEAPP打包与签名`.
-5. Drag the CEAPP project root folder into the packaging area.
-6. CanEngine validates, packages, signs, and exports the final `.ceapp`.
-
-Packaging rules:
-
-- Read the CEAPP app version from the app's own `app.json`.
-- Do not use the CanEngine host version as the CEAPP app version.
-- The skill must not embed official signing credentials, KOL signing credentials, private-key paths, or default trusted key IDs.
-- Official and KOL signing must be performed by CanEngine client/backend flows, not by public skill scripts.
-- Self-signed output is only a source/risk label; it is not official certification or security review.
+Persistent notification features additionally use `registerFeature`, `updateFeature`, `removeFeature`, `listOwnFeatures`, `getStatus`, and `openSettings`. The app owns feature creation and its source-side switch; the bridge governs permission and delivery.
+
+Phone Bridge is covered in `phone-bridge.md` because receive/send flows and privacy rules need focused handling.
+
+## 11. Final consistency checklist
+
+1. `app.json` and JavaScript use the same `appId`.
+2. The app-owned version changed only when the app changed; it does not mirror the host release.
+3. `nameI18n` and `descriptionI18n` contain `zh-CN` and `en-US`.
+4. Every capability metadata item has its required permission.
+5. Every permission maps to called code and a user-visible feature.
+6. `commands` is non-empty; every real command has a narrow flag allowlist.
+7. First-screen CSS/JS/fonts/icons are local.
+8. Package media uses `assetURL` and large media avoids data URLs.
+9. File sources normalize before business logic; object URLs are revoked.
+10. Optional bridges have disabled/denied/error states.
+11. Shareable UI and diagnostics omit paths, session URLs, tokens, credentials, and file bodies.
+12. Browser fallback and installed CanEngine behavior have both been tested.

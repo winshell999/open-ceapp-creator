@@ -148,4 +148,4 @@ Before finishing:
 
 ## Recommendation
 
-For internal tools and first-party CanEngine apps, prefer simple local assets over runtime CDN convenience. Packaging reliability matters more than shaving a few setup minutes.
+For distributed CEAPP projects, prefer simple local assets over runtime CDN convenience. Packaging reliability matters more than shaving a few setup minutes.
