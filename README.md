@@ -15,7 +15,7 @@
 
 ## CanEngine 是什么
 
-[CanEngine（灿引擎）](https://hoyee.net/canengine/) 是一个连接 AI、电脑文件、个人应用和不同终端的本地工作空间。
+[CanEngine（灿引擎）](https://hoyee.net/canengine/ ) 是一个连接 AI、电脑文件、个人应用和不同终端的本地工作空间。
 
 它不只是一个 AI 对话工具，而是让 AI 在用户授权范围内读取项目上下文、处理本地文件、修改网页或代码，并把结果继续沉淀为可重复使用的应用和工作流。
 
@@ -24,7 +24,7 @@ CanEngine 的主要能力包括：
 - **Apps**：统一安装、管理和运行个人应用，把重复工作沉淀为工具。
 - **Canvas**：承载网页、代码、文档、图片和项目文件，让 AI 直接参与修改。
 - **AI Bridge**：由 CanEngine 统一管理模型配置、API Key、权限和调用，CEAPP 不需要自行保存密钥。
-- **MCP Bridge**：连接 ChatGPT\Gemini 等支持 MCP 的 AI 客户端，让 AI 在授权范围内读取和操作画布(MCP使用方法：https://canengine.meeinn.com/mcp）。
+- **MCP Bridge**：连接 ChatGPT\Gemini 等支持 MCP 的 AI 客户端，让 AI 在授权范围内读取和操作画布，MCP使用方法： https://canengine.meeinn.com/mcp
 - **Phone Bridge**：在手机与电脑之间传递图片、文档、文字和临时素材。
 - **Notification Bridge**：让应用发送即时通知或创建计划通知。
 - **Data Bridge**：为应用提供本地数据和受控的数据访问能力。
