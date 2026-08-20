@@ -1,147 +1,342 @@
 # open-ceapp-creator
 
-用于创建 **CanEngine CEAPP 源码项目** 的开放版 Skill 与基础模板。
+用于创建 **CanEngine CEAPP** 的开源 Skill、Starter 模板和验证工具。
 
-它可以帮助开发者、创作者和 KOL 生成符合 CanEngine 规范的应用目录，包括 `app.json`、HTML、CSS、JavaScript、本地资源、双语支持以及 Host Bridge 接入代码。项目完成后，可在 CanEngine 中校验、打包和签名，最终导出 `.ceapp` 应用包。
+它帮助开发者、创作者和 AI 使用者快速生成符合 CanEngine 规范的 CEAPP 项目，包括 `app.json`、HTML、CSS、JavaScript、本地资源、双语结构，以及 AI Bridge、Phone Bridge、Notification Bridge、Data Bridge 等 Host Bridge 接入方式。
 
-> 本仓库只负责生成 CEAPP 源码项目，不提供 CanEngine 官方或 KOL 私钥，也不会直接生成带官方或 KOL 身份的最终发行包。
+完成开发后，可以直接在 CanEngine 中校验、打包和签名，导出 `.ceapp` 应用包。
 
-## 说明
+## CEAPP 是什么
 
-**CanEngine 用来统一运行和管理个人 AI 应用，CEAPP 则把已经验证有效的 AI 流程、网页工具和本地自动化任务封装成可以反复使用的应用。**
+CEAPP 是运行在 CanEngine 中的应用格式。
 
-- CanEngine 解决“应用在哪里运行、如何连接 AI、本地文件和不同设备”的问题。
-- CEAPP 解决“如何把一次性操作沉淀成稳定工具”的问题。
+它可以是一个简单的 HTML 工具，也可以包含 JavaScript、Python、Node.js、本地资源，并按需调用 CanEngine 提供的 AI、文件、数据、通知、设备互传和运行环境能力。
 
-## CanEngine 是什么
+**CanEngine 负责应用运行、授权和宿主能力；CEAPP 负责把已经验证有效的 AI 流程、网页工具或本地工作流封装成可以反复使用的应用。**
 
-[CanEngine（灿引擎）](https://hoyee.net/canengine/ ) 是一个连接 AI、电脑文件、个人应用和不同终端的本地工作空间。
+## CanEngine 提供的主要能力
 
-它不只是一个 AI 对话工具，而是让 AI 在用户授权范围内读取项目上下文、处理本地文件、修改网页或代码，并把结果继续沉淀为可重复使用的应用和工作流。
+[CanEngine（灿引擎）](https://hoyee.net/canengine/) 是连接 AI、电脑文件、个人应用和不同终端的本地工作空间。
 
-CanEngine 的主要能力包括：
+CEAPP 可以按需使用以下能力：
 
-- **Apps**：统一安装、管理和运行个人应用，把重复工作沉淀为工具。
-- **Canvas**：承载网页、代码、文档、图片和项目文件，让 AI 直接参与修改。
-- **AI Bridge**：由 CanEngine 统一管理模型配置、API Key、权限和调用，CEAPP 不需要自行保存密钥。
-- **MCP Bridge**：连接 ChatGPT\Gemini 等支持 MCP 的 AI 客户端，让 AI 在授权范围内读取和操作画布，MCP使用方法： https://canengine.meeinn.com/mcp
-- **Phone Bridge**：在手机与电脑之间传递图片、文档、文字和临时素材。
-- **Notification Bridge**：让应用发送即时通知或创建计划通知。
-- **Data Bridge**：为应用提供本地数据和受控的数据访问能力。
+- **AI Bridge**：调用文本、图文理解、图像、3D、视频等 AI 能力；模型配置、授权和 API Key 由 CanEngine 管理。
+- **MCP Bridge**：连接 ChatGPT、Gemini 等支持 MCP 的 AI 客户端，让 AI 在授权范围内读取和操作 Canvas。当前支持官方原生 MCP 与自定义 MCP，并可分别接入 ChatGPT / Gemini。使用方法：<https://canengine.meeinn.com/mcp>
+- **Phone Bridge**：在手机、电脑和 CEAPP 之间传递图片、文档和其他文件。
+- **Notification Bridge**：发送即时通知，或注册计划通知能力。
+- **Data Bridge**：保存应用私有数据，并按权限访问共享数据。
+- **File / Job / Runtime**：选择、暂存、处理、运行和导出本地文件。
+- **Locale / Clipboard / Print**：使用宿主语言、剪贴板和打印能力。
 
 产品介绍：<https://hoyee.net/canengine/>
 
 下载 CanEngine：<https://canengine.meeinn.com/download>
 
-## CEAPP 是什么
+## 如何使用这个 Skill
 
-CEAPP 是运行在 CanEngine 中的应用格式。它既可以是一个简单的 HTML 工具，也可以包含 JavaScript、Python、Node.js、本地资源，以及 CanEngine 提供的 Host Bridge 能力。
+`open-ceapp-creator` 的主要使用场景，是加载到 **Codex、WorkBuddy 等支持 SKILL 的 AI 编程 / Agent 工具** 中，让 AI 按 CEAPP 规范直接创建或修改项目。
 
-一个标准 CEAPP 项目通常包含：
+也可以在 **CanEngine 中配合 CEAPP Canvas + MCP** 使用：把支持 MCP 的 AI 客户端接入当前 Canvas，让 AI 直接读取和修改 CEAPP 项目，完成后在 CanEngine 中快速校验、打包并导出 `.ceapp` 应用包。
 
-```text
-MyApp/
-├── app.json
-├── index.html
-├── styles.css
-├── app.js
-├── assets/
-└── scripts/       # 需要本地命令或后端能力时使用
+| 使用方式 | 适合场景 | 基本流程 |
+|---|---|---|
+| **Codex / WorkBuddy 等支持 SKILL 的工具** | 从自然语言需求快速生成 CEAPP，或持续修改现有项目 | 加载 Skill → 指定工作目录 → 描述需求 → AI 生成 / 修改 CEAPP |
+| **CanEngine CEAPP Canvas + MCP** | 希望 AI 直接操作当前 CEAPP，并完成从开发到打包的完整流程 | 创建 CEAPP Canvas → 选择 Skill → 通过 MCP 接入 AI → AI 修改 Canvas → 打包导出 `.ceapp` |
+
+<p align="center">
+  <img src="./assets/readme/skill-usage.png" alt="open-ceapp-creator Skill 使用示意" width="900">
+</p>
+
+### 方式一：在 Codex、WorkBuddy 等工具中使用
+
+先下载或克隆本项目：
+
+```bash
+git clone https://github.com/winshell999/open-ceapp-creator.git
 ```
 
-开发完成后，项目需要通过 CanEngine 校验并打包为 `.ceapp` 文件。
+然后按照所使用工具的 SKILL 加载方式，把 `open-ceapp-creator` 加入当前 AI 工作环境，并让 AI 在你的 CEAPP 工作目录中执行任务。
 
-## CEAPP 可以解决什么问题
+例如：
 
-### 1. 把一次性的 AI 对话变成可重复使用的工具
+```text
+使用 open-ceapp-creator 帮我创建一个图片批量加边框的 CEAPP。
+支持本地图片导入、Phone Bridge 导入、批量处理和结果保存。
+```
 
-很多 AI 结果只停留在聊天窗口中。下次执行同类任务时，还要重新解释需求、上传文件、组织提示词和调整输出格式。
+或者直接针对已有项目：
 
-CEAPP 可以把已经验证有效的流程封装成应用，让用户通过固定界面直接使用，不需要每次从头开始。
+```text
+使用 open-ceapp-creator 检查并优化当前 CEAPP。
+重点检查 app.json、Host Bridge、Phone Bridge、双语、权限和打包兼容性。
+```
 
-### 2. 把分散的个人应用统一管理起来
+AI 会按照本 Skill 的 CEAPP 规范创建或修改项目文件。完成后可以运行仓库中的验证脚本，再把项目交给 CanEngine 打包。
 
-使用 AI 生成的网页、脚本和小工具通常散落在不同目录、平台或开发环境中，后续很难查找、维护和复用。
+### 方式二：在 CanEngine 中配合 CEAPP Canvas + MCP 使用
 
-CEAPP 将应用的代码、资源、版本、权限和运行入口放在统一结构中，再由 CanEngine 集中安装和管理。
+如果希望形成完整的 AI 协作开发流程，可以直接在 CanEngine 中使用：
 
-### 3. 连接本地文件和桌面工作流
+1. 在 CanEngine 的 `我的 → SKILL → 管理 SKILL` 中导入 `open-ceapp-creator`；
+2. 创建或打开一个 CEAPP Canvas；
+3. 在 AI 指令中选择 `open-ceapp-creator`；
+4. 通过 MCP Bridge 将 ChatGPT、Gemini 等支持 MCP 的 AI 客户端连接到当前 Canvas；
+5. 直接告诉 AI 要创建或修改什么，AI 可以在授权范围内读取、创建和修改当前 CEAPP 文件；
+6. 完成后直接在 CanEngine 中校验、打包和签名，导出 `.ceapp`。
 
-普通网页很难稳定访问本地文件、目录、运行环境和桌面能力。
+例如：
 
-CEAPP 可以通过 CanEngine 提供的受控 Bridge 读取文件、执行任务、调用 AI、导出结果，同时保留明确的权限边界。
+```text
+帮我把当前项目完善成一个可安装的 CEAPP。
+补齐双语、Phone Bridge 图片导入、错误状态和 app.json，完成后检查是否可以打包。
+```
 
-### 4. 减少重复开发
+这种方式适合从需求、开发、调试一直做到最终 `.ceapp` 导出的完整流程，不需要反复在 AI、代码目录和打包工具之间手动搬运内容。
 
-CEAPP 可以复用 CanEngine 已经提供的 AI、文件、通知、数据和手机互传能力。开发者不需要在每个应用里重复实现：
+## 快速开始
 
-- API Key 管理
-- 模型接入
-- 文件上传与导出
-- 手机和电脑之间的素材传递
-- 通知系统
-- 本地数据存储
+新建 CEAPP 时，推荐从 `assets/starter/` 开始。
 
-### 5. 支持本地运行和离线优先
+标准结构：
 
-CEAPP 可以把 HTML、CSS、JavaScript、图片和字体等资源放在应用包内。
+```text
+my-app/
+├── app.json
+├── index.html
+├── app.js
+├── styles.css
+├── assets/
+│   ├── ceapp-i18n.js
+│   └── logo.png
+├── data/                 # 需要本地数据时使用
+│   └── localdb.schema.json
+└── scripts/              # 需要 Python / Node / 本地任务时使用
+```
 
-对于不依赖在线服务的功能，即使没有网络，应用仍然可以启动和使用；需要调用在线 AI 服务时，再由 CanEngine 统一处理连接和授权。
+创建应用时至少需要完成：
 
-### 6. 让应用可以持续维护和升级
+1. 设置应用目录名和 `appId`；
+2. 设置应用名称、描述和版本；
+3. 确保 JavaScript 中的 `APP_ID` 与 `app.json` 一致；
+4. 删除不需要的权限和能力；
+5. 完成一个可以独立使用的核心流程；
+6. 在浏览器中验证纯前端逻辑；
+7. 在 CanEngine 中验证真实 Host Bridge；
+8. 运行项目验证；
+9. 在 CanEngine 中打包并签名。
 
-每个 CEAPP 都有独立的应用 ID、版本、权限声明、运行环境和发布者身份。
+## Starter 默认包含什么
 
-相比散落的脚本或临时网页，CEAPP 更适合长期维护、版本升级和统一分发。
+`assets/starter/` 提供一个最小可运行 CEAPP 起点，包括：
 
-## 官方、KOL 和自签 CEAPP 的区别
+- 本地 HTML / CSS / JavaScript；
+- `zh-CN` / `en-US` 双语结构；
+- CanEngine 宿主语言同步；
+- 本地资源加载；
+- app-private Data Bridge 示例；
+- 标准 `app.json`；
+- 可直接运行的验证结构。
 
-CanEngine 会根据签名身份标识应用来源，并限制应用是否可以分享给其他用户。
+Starter 只是起点。制作真实应用时，应删除未使用的示例、权限和能力。
 
-| 类型 | 签名身份 | CanEngine 标识 | 是否可以分享给别人使用 | 适用场景 |
-|---|---|---|---|---|
-| **官方 CEAPP** | 由 CanEngine 官方身份签名 | 绿色“官方”标签 | **可以** | CanEngine 官方发布和维护的应用 |
-| **KOL CEAPP** | 由 CanEngine 授权的 KOL、创作者、机构或合作伙伴身份签名 | 蓝色发布者名称标签 | **可以** | 经过平台授权的发布者向其他用户分发应用 |
-| **自签 CEAPP** | 由普通用户使用自己的本地开发者身份签名 | 黄色用户名称标签 | **不可以** | 个人开发、测试和自己使用的应用 |
+## 版本与兼容性
 
-### 重要安全规则
+项目中常见的版本字段分别表示：
 
-- **官方 CEAPP 和 KOL CEAPP 可以分享给其他 CanEngine 用户使用。**
-- **自签 CEAPP 只能由签名者自己使用，不能分享给其他用户使用。**
-- 自签限制不是功能缺失，而是安全边界：它可以降低未知代码通过个人签名在用户之间传播的风险。
-- 需要对外分享的应用，应通过 CanEngine 官方或经过授权的 KOL 发布者身份进行签名和发布。
+- **CEAPP 应用版本**：`app.json` 中的 `version`，用于标识当前应用版本；
+- **最低 CanEngine 版本**：`app.json` 中的 `minCanEngineVersion`，表示运行该应用所需的最低宿主版本；
+- **open-ceapp-creator 发布版本**：用于标识本 Skill、Starter 和开发规范的更新版本。
 
-> 签名用于识别应用来源、检查应用包是否被修改，并向用户提示风险等级。签名不等于对应用代码进行了完整安全审计，用户仍应确认应用申请的权限是否合理。
+开发自己的 CEAPP 时，只需要根据应用实际变化维护自己的 `version`，并根据所使用的 Host Bridge 能力设置合适的 `minCanEngineVersion`。
 
-CanEngine 还可能显示以下状态：
+## Host Bridge 使用原则
 
-- **未签名**：灰色标签，无法确认应用来源。
-- **签名无效**：红色标签，应用包可能在签名后被修改，不应继续使用。
+CEAPP 通过 `window.CanEngine` 使用宿主能力。
 
-## CEAPP 创建与发布流程
+推荐统一使用：
 
-1. 使用本 Skill 创建或修改 CEAPP 源码项目。
-2. 确认项目根目录至少包含 `app.json` 和 `index.html`。
-3. 确认 CSS、JavaScript、图片、字体等关键资源均保存在项目目录中。
-4. 打开 CanEngine。
-5. 进入 `我的 → 开发者身份 / CEAPP打包与签名`。
-6. 将 CEAPP 项目根目录拖入打包区域。
-7. CanEngine 校验项目，并根据当前开发者身份完成打包和签名。
-8. 导出最终的 `.ceapp` 文件。
-9. 官方或 KOL 签名的 CEAPP 可以分享给其他用户；自签 CEAPP 仅供本人使用。
+```js
+function getBridge() {
+  return window.CanEngine ||
+    (window.parent && window.parent.CanEngine) ||
+    null
+}
+```
 
-## 本仓库包含什么
+使用 Host Bridge 时遵循三个原则：
+
+1. **先判断能力是否存在，再调用。**
+2. **只申请应用真正需要的权限。**
+3. **关键功能必须在 CanEngine 中实际验证。**
+
+不要直接调用 `window.runtime.*`，也不要根据桌面端已有功能猜测一个不存在的 Host Bridge 方法。
+
+详细说明：[`references/manifest-and-host-bridge.md`](./references/manifest-and-host-bridge.md)
+
+## 文件和图片导入
+
+CEAPP 中常见的文件来源包括：
+
+1. 浏览器文件选择器；
+2. 粘贴的 `File` / `Blob`；
+3. 浏览器 DOM Drag & Drop；
+4. Finder / Explorer 原生拖入；
+5. Phone Bridge；
+6. Job 或其他宿主管理结果文件。
+
+推荐将不同来源统一进入同一个业务处理管线：
+
+```text
+picker ───────┐
+paste ────────┤
+DOM drop ─────┤
+host drop ────┼→ normalize/import → validate → preview → app state
+Phone Bridge ─┘
+```
+
+这样可以避免不同入口出现不同处理结果。
+
+## Phone Bridge
+
+Phone Bridge 用于手机、电脑和 CEAPP 之间的文件传递。
+
+典型流程：
+
+```text
+用户点击“从手机导入”
+→ CEAPP 记录当前导入目标
+→ 建立文件接收流程
+→ 打开 Phone Bridge
+→ 手机上传文件
+→ CEAPP 获得宿主管理的文件引用
+→ 读取并校验文件
+→ 进入应用自己的处理流程
+```
+
+如果一个应用中有多个图片位置，例如“待处理图片”和“Cover 模板”，应在打开 Phone Bridge 前记录明确的 `targetId`，避免文件返回后导入到错误位置。
+
+详细说明：[`references/phone-bridge.md`](./references/phone-bridge.md)
+
+## 外部网页
+
+CEAPP 运行在桌面 WebView 中。
+
+需要打开网页时，优先使用标准 HTTPS 链接：
+
+```html
+<a href="https://example.com" target="_blank" rel="noopener noreferrer">
+  打开网页
+</a>
+```
+
+如果未来宿主提供明确的 external-navigation Host Bridge，可以在检测到该能力时优先使用，并保留普通链接作为兼容方式。
+
+## 常见开发问题
+
+| 问题 | 推荐方式 |
+|---|---|
+| 桌面端有某个功能，CEAPP 是否一定能调用？ | 不一定。以当前 `window.CanEngine` 实际暴露的能力为准 |
+| Chrome 中运行正常，是否代表 CEAPP 已完成？ | 不代表。Host Bridge 功能需要在 CanEngine 中测试 |
+| Phone Bridge 打开后，文件会自动进入当前图片框吗？ | 不会自动完成业务绑定，应用需要维护明确的导入目标 |
+| 所有图片都可以使用 `assetURL()` 吗？ | 不可以。`assetURL()` 主要用于 CEAPP 包内资源 |
+| Finder / Explorer 拖入只监听 DOM `drop` 可以吗？ | 不建议，宿主中应同时兼容原生 file-drop bridge |
+| 可以直接调用 `window.runtime.*` 吗？ | 不可以，应通过 `window.CanEngine` 公共 Host Bridge |
+| Manifest 中多写权限就能获得更多能力吗？ | 不能。权限必须对应宿主已经支持的能力 |
+| `getLocale()` 是否一定同步返回？ | 不一定，代码应兼容异步结果 |
+
+更多案例：[`references/ceapp-integration-pitfalls.md`](./references/ceapp-integration-pitfalls.md)
+
+## 项目验证
+
+仓库提供两个验证工具。
+
+### 验证 CEAPP 项目
+
+```bash
+python3 scripts/validate_ceapp.py /path/to/ceapp-project
+```
+
+会检查：
+
+- `app.json` 是否有效；
+- `appId`、入口文件和图标；
+- Capability 与 Permission 是否匹配；
+- 中英文文案是否完整；
+- 是否包含远程启动依赖；
+- 是否包含常见敏感文件和路径；
+- Starter 结构是否符合 CEAPP 规范。
+
+验证本仓库 Starter：
+
+```bash
+python3 scripts/validate_ceapp.py assets/starter
+```
+
+### 检查公开仓库
+
+```bash
+python3 scripts/audit_public_repo.py
+```
+
+用于检查常见的密钥、凭据、私有路径、私有网络地址和不应提交的文件。
+
+GitHub Push / Pull Request 也会自动执行核心验证。
+
+## 项目结构
 
 ```text
 open-ceapp-creator/
-├── assets/starter/                 # CEAPP 基础模板
-├── references/                     # 开发、Bridge、离线和签名规范
-├── SKILL.md                        # Skill 主说明
+├── .github/workflows/validate.yml
+├── agents/openai.yaml
+├── assets/
+│   ├── readme/                         # README 示例图片
+│   └── starter/                        # CEAPP 基础模板
+├── references/
+│   ├── ceapp-integration-pitfalls.md
+│   ├── manifest-and-host-bridge.md
+│   ├── phone-bridge.md
+│   ├── bilingual-framework.md
+│   ├── offline-runtime.md
+│   └── packaging-and-signing.md
+├── scripts/
+│   ├── validate_ceapp.py
+│   └── audit_public_repo.py
+├── CONTRIBUTING.md
+├── SECURITY.md
+├── SKILL.md
 ├── README.md
 └── LICENSE
 ```
 
-`assets/starter/` 默认采用本地 HTML、CSS 和 JavaScript，不依赖远程 CDN，并提供双语、AI Bridge 和 Notification Bridge 的基础示例。
+## 打包与签名
+
+开发完成并通过验证后，在 CanEngine 中进入 CEAPP 打包与签名功能，选择或拖入 CEAPP 项目根目录。
+
+CanEngine 会完成：
+
+1. 项目检查；
+2. CEAPP 打包；
+3. 应用来源签名；
+4. 导出 `.ceapp` 文件。
+
+<p align="center">
+  <img src="./assets/readme/package-ceapp.png" alt="CanEngine CEAPP 打包与签名" width="900">
+</p>
+
+本仓库不保存 API Key、签名私钥或其他发布凭据。
+
+详细说明：[`references/packaging-and-signing.md`](./references/packaging-and-signing.md)
+
+## 参考文档
+
+- [Manifest 与 Host Bridge](./references/manifest-and-host-bridge.md)
+- [Phone Bridge](./references/phone-bridge.md)
+- [CEAPP 集成常见问题](./references/ceapp-integration-pitfalls.md)
+- [双语框架](./references/bilingual-framework.md)
+- [离线与 Runtime](./references/offline-runtime.md)
+- [打包与签名](./references/packaging-and-signing.md)
+- [贡献指南](./CONTRIBUTING.md)
+- [安全说明](./SECURITY.md)
 
 ## License
 

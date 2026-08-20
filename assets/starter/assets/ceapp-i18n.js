@@ -8,7 +8,21 @@
   }
 
   function getBridge() {
-    return global.CanEngine || (global.parent && global.parent.CanEngine) || null;
+    try {
+      if (global.CanEngine) return global.CanEngine;
+    } catch {
+      // Ignore host access failures and keep standalone fallback usable.
+    }
+
+    try {
+      if (global.parent && global.parent !== global && global.parent.CanEngine) {
+        return global.parent.CanEngine;
+      }
+    } catch {
+      // A cross-origin parent may reject property access in browser debugging.
+    }
+
+    return null;
   }
 
   function interpolate(template, vars) {
@@ -26,11 +40,10 @@
 
     let locale = defaultLocale;
     let hostUnsubscribe = null;
+    let disposed = false;
 
     try {
-      const bridge = getBridge();
       locale = normalizeLocale(
-        bridge?.getLocale?.() ||
         global.localStorage?.getItem(storageKey) ||
         global.navigator?.language ||
         defaultLocale
@@ -46,47 +59,83 @@
     }
 
     function notify() {
+      if (disposed) return;
       syncDocumentLanguage();
       listeners.forEach((listener) => {
         try {
           listener(locale);
         } catch {
-          // ignore listener errors from app consumers
+          // Ignore listener errors from app consumers.
         }
       });
     }
 
-    function setLocale(nextLocale, options = {}) {
+    function applyLocale(nextLocale, { persist = true } = {}) {
+      if (disposed) return locale;
       const resolved = normalizeLocale(nextLocale);
+      const changed = resolved !== locale;
       locale = resolved;
-      try {
-        global.localStorage?.setItem(storageKey, resolved);
-      } catch {
-        // ignore storage failures
-      }
-      if (options.propagate !== false) {
+
+      if (persist) {
         try {
-          getBridge()?.setLocale?.(resolved);
+          global.localStorage?.setItem(storageKey, resolved);
         } catch {
-          // ignore bridge propagation failures
+          // Ignore storage failures.
         }
       }
-      notify();
+
+      if (changed) notify();
+      else syncDocumentLanguage();
       return locale;
+    }
+
+    function setLocale(nextLocale, options = {}) {
+      const resolved = applyLocale(nextLocale);
+
+      if (options.propagate !== false) {
+        try {
+          const result = getBridge()?.setLocale?.(resolved);
+          if (result && typeof result.catch === 'function') {
+            result.catch(() => {});
+          }
+        } catch {
+          // Ignore bridge propagation failures; local locale still works.
+        }
+      }
+
+      return locale;
+    }
+
+    async function syncHostLocale() {
+      const bridge = getBridge();
+      if (!bridge?.getLocale) return;
+
+      try {
+        const hostLocale = await bridge.getLocale();
+        if (!disposed && hostLocale) {
+          applyLocale(hostLocale);
+        }
+      } catch {
+        // Keep app/browser fallback locale.
+      }
     }
 
     try {
       const bridge = getBridge();
       if (bridge?.onLocaleChange) {
-        hostUnsubscribe = bridge.onLocaleChange((nextLocale) => {
-          setLocale(nextLocale, { propagate: false });
+        const maybeUnsubscribe = bridge.onLocaleChange((nextLocale) => {
+          applyLocale(nextLocale);
         });
+        if (typeof maybeUnsubscribe === 'function') {
+          hostUnsubscribe = maybeUnsubscribe;
+        }
       }
     } catch {
       hostUnsubscribe = null;
     }
 
     syncDocumentLanguage();
+    void syncHostLocale();
 
     return {
       appId,
@@ -94,6 +143,9 @@
         return locale;
       },
       setLocale,
+      refreshFromHost() {
+        return syncHostLocale();
+      },
       subscribe(listener) {
         if (typeof listener !== 'function') return () => {};
         listeners.add(listener);
@@ -103,6 +155,7 @@
         };
       },
       dispose() {
+        disposed = true;
         if (typeof hostUnsubscribe === 'function') {
           hostUnsubscribe();
         }

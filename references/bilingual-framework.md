@@ -10,7 +10,7 @@
 
 When the app is inside CanEngine:
 
-1. `CanEngine.getLocale()`
+1. host locale from `CanEngine.getLocale()`
 2. app-local storage fallback
 3. `navigator.language`
 4. app default locale
@@ -23,15 +23,26 @@ When the app is standalone:
 
 ## Host Bridge Contract
 
-CanEngine should expose:
+Treat locale calls as potentially asynchronous:
 
-- `getLocale(): string`
+- `getLocale(): string | Promise<string>`
 - `setLocale(locale: string): string | Promise<string>`
-- `onLocaleChange(handler): unsubscribe`
+- `onLocaleChange(handler): unsubscribe | void`
 
-The ceapp should:
+Do not pass the raw return value of `getLocale()` directly into string normalization unless you have confirmed it is not a Promise.
 
-- subscribe once on startup
+A robust startup pattern is:
+
+1. render immediately from local storage / `navigator.language` so the first screen is not blocked;
+2. resolve `await CanEngine.getLocale()` when the bridge is available;
+3. apply the host locale when it arrives;
+4. subscribe once to future host locale changes;
+5. unsubscribe when the application/view is disposed.
+
+The bundled `assets/starter/assets/ceapp-i18n.js` follows this pattern.
+
+The CEAPP should also:
+
 - update `document.documentElement.lang`
 - re-render visible copy when locale changes
 - localize document title, labels, placeholders, empty/error states, image alt text, and accessible names
@@ -83,11 +94,11 @@ For app cards shown by CanEngine, include localized metadata in `app.json` when 
 }
 ```
 
-Keep `name` and `description` as safe defaults, but do not rely on host-side fallback tables for first-party apps when manifest metadata can carry the translations.
+Keep `name` and `description` as safe defaults, but do not rely on host-side fallback tables when manifest metadata can carry the translations.
 
 ## Current Product Direction
 
-The current CanEngine platform already owns locale state and exposes a host bridge for it. New apps should usually:
+The current CanEngine platform owns locale state and exposes a Host Bridge for it. New apps should usually:
 
 - follow host locale automatically
 - keep standalone fallback behavior
