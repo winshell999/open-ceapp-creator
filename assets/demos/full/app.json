@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "appId": "ceapp-demo-full",
+  "name": "CEAPP full demo",
+  "nameI18n": {
+    "zh-CN": "CEAPP full demo",
+    "en-US": "CEAPP full demo"
+  },
+  "version": "1.0.0",
+  "description": "CanEngine public bridge demonstration: full",
+  "descriptionI18n": {
+    "zh-CN": "CanEngine 桥接演示",
+    "en-US": "CanEngine public bridge demonstration"
+  },
+  "entry": "index.html",
+  "icon": "assets/logo.png",
+  "minCanEngineVersion": "1.7.3",
+  "platforms": [
+    {
+      "os": "*",
+      "arch": "*"
+    }
+  ],
+  "runtime": {
+    "requirements": [
+      {
+        "id": "base-runtime",
+        "optional": true
+      },
+      {
+        "id": "python-runtime",
+        "optional": true
+      }
+    ]
+  },
+  "commands": {
+    "inspect": {
+      "executable": "python3",
+      "baseArgs": [
+        "scripts/process_file.py"
+      ],
+      "allowedFlags": [
+        "--sleep"
+      ]
+    }
+  },
+  "capabilities": {
+    "ai": {
+      "required": false,
+      "features": [
+        "ai.text.generate",
+        "ai.vision.analyze",
+        "ai.image.generate",
+        "ai.model3d.generate",
+        "ai.video.generate"
+      ]
+    },
+    "dataBridge": {
+      "required": false,
+      "datasets": [],
+      "actions": [],
+      "mode": "read",
+      "local": {
+        "enabled": true,
+        "dbFile": "bridge-lab.sqlite",
+        "schemaEntry": "data/localdb.schema.json",
+        "schemaVersion": 1
+      }
+    },
+    "notification": {
+      "required": false,
+      "reason": "User-triggered test notification",
+      "capabilities": [
+        "send"
+      ]
+    }
+  },
+  "permissions": [
+    "ai.text.generate",
+    "ai.vision.analyze",
+    "ai.image.generate",
+    "ai.model3d.generate",
+    "ai.video.generate",
+    "data.read",
+    "data.write",
+    "phoneBridge.openPanel",
+    "phoneBridge.createSession",
+    "phoneBridge.receiveFiles",
+    "phoneBridge.readFiles",
+    "phoneBridge.addFiles",
+    "phoneBridge.sendToPhone",
+    "notification.send"
+  ]
+}

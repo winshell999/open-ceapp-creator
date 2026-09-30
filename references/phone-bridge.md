@@ -1,215 +1,29 @@
-# Phone Bridge for Public CEAPP Source
+# Phone Bridge
 
-Use Phone Bridge when users need to move files from a phone into a desktop CEAPP or explicitly send CEAPP output back to a phone. Keep a normal file picker fallback whenever possible.
+Use the host Phone Bridge, not a CEAPP-owned LAN server, cloud relay or hardcoded IP.
 
-As of the current CanEngine public contract sync, Phone Bridge remains a **host-level system capability**. CEAPPs use the Host API; they do not own the LAN transfer server, discovery protocol, connection code, or temporary workspace. The Host API compatibility line remains `2026-07`.
+## Full demonstration
 
-## Public-safe boundary
+1. Open Phone Bridge workbench, or Create session.
+2. Create session subscribes to received files first, then calls createSession({targetAppId,acceptTypes,maxFiles}) and opens the host panel for its authoritative QR UI.
+3. Scan using a real connected phone and send a permitted sample file.
+4. Receive callbacks hold Phone Bridge file records with fileId.
+5. Import received file calls readFile(fileId), obtains Blob, stages it with the app ID, and produces a StagedFile.id usable for Python.
+6. Add sample puts a small Blob into the workbench via addFile.
+7. Send sample calls sendToPhone({fileIds}) only after the app confirmation.
 
-- Phone Bridge is a CanEngine system capability, not a CEAPP-owned server.
-- Call only methods actually exposed through `window.CanEngine.phoneBridge`; do not infer APIs from CanEngine desktop UI or private implementation details.
-- Do not create a custom LAN listener for normal phone intake.
-- Never log or publish QR payloads, session URLs, tokens, pairing codes, private IP addresses, device identifiers, or desktop paths.
-- Do not persist a session descriptor. Create a new short-lived session when the user asks.
-- Degrade to a picker or clear unavailable state outside CanEngine.
+The callback is installed only for an intentional session, not at startup. Each app view owns and removes its subscription. Callback exceptions are contained.
+Session data is not printed or exported by the Lab. The host panel handles QR presentation/renewal; do not attempt to render a qrUrl as an image or persist an expired token.
 
-## The key integration rule
+## Public methods
 
-**Opening Phone Bridge and importing a file into the current CEAPP target are separate operations.**
+openPanel(), createSession(request), onFilesReceived(handler), readFile(fileId), addFile({name,mimeType,data,targetAppId}), sendToPhone({fileIds}).
+Permissions map respectively to phoneBridge.openPanel/createSession/receiveFiles/readFiles/addFiles/sendToPhone.
+Use only the permissions actually exercised. `requireUserConfirm` is not consumed by the inspected send wrapper and therefore is not a security control.
 
-A system Phone Bridge panel may successfully receive a file while the CEAPP still receives nothing. The application must maintain its own intake context and explicitly route the host-managed file into the intended business target.
+## Limits and failure states
 
-Bad assumption:
-
-```text
-open Phone Bridge
-→ upload succeeds
-→ assume the currently visible image slot now owns that file
-```
-
-Recommended flow:
-
-```text
-user chooses “Import from phone”
-→ capture stable targetId/purpose
-→ establish the supported receive callback/session
-→ open Phone Bridge
-→ receive host-managed file descriptor
-→ read/normalize the file
-→ import into that targetId
-→ clean up the listener/session
-```
-
-If an app has multiple targets such as `pending-image`, `cover-template`, or `reference-image`, never determine the target later by querying whichever DOM element is selected after the upload finishes.
-
-## Permissions
-
-Declare only methods the final app calls. Current public examples use permission names such as:
-
-```json
-"permissions": [
-  "phoneBridge.openPanel",
-  "phoneBridge.createSession",
-  "phoneBridge.receiveFiles",
-  "phoneBridge.readFiles"
-]
-```
-
-Optional output permissions:
-
-```json
-"permissions": [
-  "phoneBridge.addFiles",
-  "phoneBridge.sendToPhone"
-]
-```
-
-Do not keep output permissions in an input-only app. A permission declaration does not create a Host API method; feature-detect the method at runtime.
-
-## Resolve the bridge safely
-
-```js
-function getBridge() {
-  try {
-    if (window.CanEngine) return window.CanEngine
-  } catch {}
-
-  try {
-    if (window.parent && window.parent !== window && window.parent.CanEngine) {
-      return window.parent.CanEngine
-    }
-  } catch {}
-
-  return null
-}
-```
-
-Resolve the bridge when the user triggers the action. Do not cache a missing bridge forever.
-
-## Receive flow
-
-When the current host exposes `onFilesReceived` + `readFile`, treat the receive descriptor as metadata, not the file body. Read each `fileId`, normalize the returned Blob to a File, then reuse the app's normal file handler.
-
-```js
-const bridge = getBridge()
-const phone = bridge?.phoneBridge
-
-if (typeof phone?.onFilesReceived !== 'function' || typeof phone?.readFile !== 'function') {
-  showDesktopPickerFallback()
-  return
-}
-
-const unsubscribe = phone.onFilesReceived(async (items) => {
-  for (const item of items) {
-    const blob = await phone.readFile(item.fileId)
-    const file = new File(
-      [blob],
-      item.name || `phone-${Date.now()}`,
-      { type: blob.type || item.mimeType || 'application/octet-stream' }
-    )
-    await handleFile(file, 'phone-bridge')
-  }
-})
-```
-
-Do not put the descriptor directly into a business file list. Do not use a generic `window.message` listener as the primary receive channel. Save and call `unsubscribe` when the view is destroyed.
-
-## Multiple-target intake
-
-Capture a stable application target before opening the async phone flow:
-
-```js
-let pendingPhoneTarget = null
-
-async function importFromPhone(targetId, purpose) {
-  pendingPhoneTarget = { targetId, purpose }
-
-  const phone = getBridge()?.phoneBridge
-  if (!phone) {
-    return openPickerForTarget(targetId)
-  }
-
-  // Subscribe/create the supported receive flow first.
-  // Then open the host Phone Bridge UI/session.
-}
-
-async function applyPhoneFile(file, context = pendingPhoneTarget) {
-  if (!context?.targetId) return
-  const normalized = await normalizeInputFile(file)
-  await applyFileToTarget(context.targetId, normalized, context.purpose)
-}
-```
-
-The exact method set still depends on the running host. The public rule is more important than any example method name: **capture target → establish intake → open transfer UI → receive/read → normalize → apply to captured target**.
-
-## Create a receive session
-
-When the host exposes `createSession`, create it only after a user action and explain what the phone upload will be used for.
-
-```js
-const session = await phone.createSession({
-  targetAppId: APP_ID,
-  acceptTypes: ['image/*', 'application/pdf', 'text/plain'],
-  maxFiles: 12
-})
-```
-
-Treat returned QR/session fields as sensitive runtime data:
-
-- render them only in the current UI when needed
-- do not write them to logs, diagnostics, source files, analytics, or persistent storage
-- when producing shareable diagnostics, keep only non-sensitive state such as `sessionCreated: true`
-
-When the host exposes only a system panel flow, use that flow plus the supported application intake mechanism; do not invent a private file-path lookup.
-
-## Add CEAPP output to Phone Bridge
-
-When the running host exposes `addFile`, prefer Blob/File-style data and let the host manage transfer encoding.
-
-```js
-const record = await phone.addFile({
-  name: 'result.png',
-  mimeType: 'image/png',
-  data: resultBlob,
-  targetAppId: APP_ID,
-  sourceAppName: 'Example App'
-})
-```
-
-Do not convert large output to a data URL merely to pass it into Phone Bridge.
-
-## Send existing Phone Bridge files to a phone
-
-Only expose this action when the user can see which files will be sent and the host exposes the send method.
-
-```js
-await phone.sendToPhone({
-  fileIds: selectedFileIds
-})
-```
-
-## Unify file sources
-
-Do not maintain a separate business pipeline for phone uploads. Picker, paste, browser drop, host-native drop, and Phone Bridge should converge before product logic:
-
-```text
-picker ───────┐
-paste ────────┤
-DOM drop ─────┤
-host drop ────┼→ normalize/import → validate → preview → app state
-Phone Bridge ─┘
-```
-
-This prevents one intake path from gaining validation/cropping/state behavior that another path accidentally skips.
-
-## UX checklist
-
-1. Explain why the phone flow is useful before opening it.
-2. Keep a desktop picker fallback.
-3. Show accepted types and file limits.
-4. Capture a stable target ID before async transfer starts.
-5. Display file name/type/size after the file is read, not a private desktop path.
-6. Unsubscribe listeners when the app closes or the feature unmounts.
-7. Show disabled, denied, expired-session, empty, receiving, success, and error states.
-8. Never include live session details in copied diagnostics.
-9. Verify the flow inside CanEngine; a Chrome-only success is insufficient.
+The Lab caps Blob/base64 imports at 8 MiB. For larger inputs use the host workbench or a future documented streaming API; do not allocate unbounded base64 buffers.
+Distinguish no phone connected, bridge disabled, CEAPP access disabled, permission denied, session expired, file removed and network interruption.
+Canceling or closing the CEAPP does not imply a host-owned session is deleted. No session-delete method is exposed in the inspected JS contract; do not invent one.
+Never count a mocked callback as device acceptance. Native testing must include a real phone, reverse send, expired session and duplicate filename.

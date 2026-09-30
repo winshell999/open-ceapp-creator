@@ -1,48 +1,94 @@
 {
   "schemaVersion": 1,
-  "appId": "starter-app",
-  "name": "Starter Notes",
+  "appId": "ceapp-bridge-lab",
+  "name": "CEAPP Bridge Lab",
   "nameI18n": {
-    "zh-CN": "Starter Notes",
-    "en-US": "Starter Notes"
+    "zh-CN": "CEAPP Bridge Lab",
+    "en-US": "CEAPP Bridge Lab"
   },
   "version": "1.0.0",
-  "description": "An offline-first bilingual CEAPP starter with one useful local feature.",
+  "description": "CanEngine public bridge demonstration: full",
   "descriptionI18n": {
-    "zh-CN": "一个离线优先、双语并包含实用本地功能的 CEAPP 起点。",
-    "en-US": "An offline-first bilingual CEAPP starter with one useful local feature."
+    "zh-CN": "CanEngine 桥接演示",
+    "en-US": "CanEngine public bridge demonstration"
   },
   "entry": "index.html",
   "icon": "assets/logo.png",
-  "minCanEngineVersion": "1.5.8",
+  "minCanEngineVersion": "1.7.3",
   "platforms": [
     {
       "os": "*",
       "arch": "*"
     }
   ],
+  "runtime": {
+    "requirements": [
+      {
+        "id": "base-runtime",
+        "optional": true
+      },
+      {
+        "id": "python-runtime",
+        "optional": true
+      }
+    ]
+  },
   "commands": {
-    "noop": {
-      "executable": "echo",
+    "inspect": {
+      "executable": "python3",
       "baseArgs": [
-        "starter-app"
+        "scripts/process_file.py"
       ],
-      "allowedFlags": []
+      "allowedFlags": [
+        "--sleep"
+      ]
     }
   },
   "capabilities": {
+    "ai": {
+      "required": false,
+      "features": [
+        "ai.text.generate",
+        "ai.vision.analyze",
+        "ai.image.generate",
+        "ai.model3d.generate",
+        "ai.video.generate"
+      ]
+    },
     "dataBridge": {
       "required": false,
+      "datasets": [],
+      "actions": [],
+      "mode": "read",
       "local": {
         "enabled": true,
-        "dbFile": "starter-app.sqlite",
+        "dbFile": "bridge-lab.sqlite",
         "schemaEntry": "data/localdb.schema.json",
         "schemaVersion": 1
       }
+    },
+    "notification": {
+      "required": false,
+      "reason": "User-triggered test notification",
+      "capabilities": [
+        "send"
+      ]
     }
   },
   "permissions": [
+    "ai.text.generate",
+    "ai.vision.analyze",
+    "ai.image.generate",
+    "ai.model3d.generate",
+    "ai.video.generate",
     "data.read",
-    "data.write"
+    "data.write",
+    "phoneBridge.openPanel",
+    "phoneBridge.createSession",
+    "phoneBridge.receiveFiles",
+    "phoneBridge.readFiles",
+    "phoneBridge.addFiles",
+    "phoneBridge.sendToPhone",
+    "notification.send"
   ]
 }

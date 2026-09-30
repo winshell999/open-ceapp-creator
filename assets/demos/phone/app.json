@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "appId": "ceapp-demo-phone",
+  "name": "CEAPP phone demo",
+  "nameI18n": {
+    "zh-CN": "CEAPP phone demo",
+    "en-US": "CEAPP phone demo"
+  },
+  "version": "1.0.0",
+  "description": "CanEngine public bridge demonstration: phone",
+  "descriptionI18n": {
+    "zh-CN": "CanEngine 桥接演示",
+    "en-US": "CanEngine public bridge demonstration"
+  },
+  "entry": "index.html",
+  "icon": "assets/logo.png",
+  "minCanEngineVersion": "1.7.3",
+  "platforms": [
+    {
+      "os": "*",
+      "arch": "*"
+    }
+  ],
+  "runtime": {
+    "requirements": [
+      {
+        "id": "base-runtime",
+        "optional": true
+      }
+    ]
+  },
+  "commands": {
+    "noop": {
+      "executable": "echo",
+      "baseArgs": [
+        "ceapp-demo-phone"
+      ]
+    }
+  },
+  "capabilities": {},
+  "permissions": [
+    "phoneBridge.openPanel",
+    "phoneBridge.createSession",
+    "phoneBridge.receiveFiles",
+    "phoneBridge.readFiles",
+    "phoneBridge.addFiles",
+    "phoneBridge.sendToPhone"
+  ]
+}

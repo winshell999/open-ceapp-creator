@@ -1,4 +1,4 @@
 interface:
   display_name: "Open CEAPP Creator"
-  short_description: "Create clear, offline-ready CEAPP source projects"
-  default_prompt: "Use $open-ceapp-creator to build a bilingual, package-ready CEAPP with a useful offline core and minimal permissions."
+  short_description: "Build CEAPPs with verified bridges, working demos and test gates"
+  default_prompt: "Create or repair a CanEngine CEAPP using the current handoff, the tested bridge adapter and the smallest appropriate profile. Validate the result and separate simulated checks from native-host acceptance."

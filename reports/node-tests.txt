@@ -1,0 +1,232 @@
+TAP version 13
+# Subtest: cross-origin parent never crashes detection
+ok 1 - cross-origin parent never crashes detection
+  ---
+  duration_ms: 0.976495
+  type: 'test'
+  ...
+# Subtest: hostless call is explicit, never fake success
+ok 2 - hostless call is explicit, never fake success
+  ---
+  duration_ms: 1.26339
+  type: 'test'
+  ...
+# Subtest: delayed bridge injection is awaited
+ok 3 - delayed bridge injection is awaited
+  ---
+  duration_ms: 41.143056
+  type: 'test'
+  ...
+# Subtest: disabled parent resolution prevents outer context reuse
+ok 4 - disabled parent resolution prevents outer context reuse
+  ---
+  duration_ms: 0.188239
+  type: 'test'
+  ...
+# Subtest: method owner binding is retained
+ok 5 - method owner binding is retained
+  ---
+  duration_ms: 0.458459
+  type: 'test'
+  ...
+# Subtest: resolved runtime failure is rejected
+ok 6 - resolved runtime failure is rejected
+  ---
+  duration_ms: 0.341946
+  type: 'test'
+  ...
+# Subtest: native picker cancellation is an empty selection
+ok 7 - native picker cancellation is an empty selection
+  ---
+  duration_ms: 0.85107
+  type: 'test'
+  ...
+# Subtest: picker uses real object request
+ok 8 - picker uses real object request
+  ---
+  duration_ms: 0.186376
+  type: 'test'
+  ...
+# Subtest: picker does not turn malformed envelopes into a file
+ok 9 - picker does not turn malformed envelopes into a file
+  ---
+  duration_ms: 0.366192
+  type: 'test'
+  ...
+# Subtest: legacy picker used only if current method absent
+ok 10 - legacy picker used only if current method absent
+  ---
+  duration_ms: 0.416928
+  type: 'test'
+  ...
+# Subtest: denial never falls back to a second native picker
+ok 11 - denial never falls back to a second native picker
+  ---
+  duration_ms: 0.288367
+  type: 'test'
+  ...
+# Subtest: mutations are single-flight
+ok 12 - mutations are single-flight
+  ---
+  duration_ms: 20.311568
+  type: 'test'
+  ...
+# Subtest: mutation timeout remains locked through late settlement until reconciliation
+ok 13 - mutation timeout remains locked through late settlement until reconciliation
+  ---
+  duration_ms: 34.92464
+  type: 'test'
+  ...
+# Subtest: read timeout is not reported as cancelled execution
+ok 14 - read timeout is not reported as cancelled execution
+  ---
+  duration_ms: 4.086089
+  type: 'test'
+  ...
+# Subtest: safe URLs reject dangerous schemes and embedded credentials
+ok 15 - safe URLs reject dangerous schemes and embedded credentials
+  ---
+  duration_ms: 0.488363
+  type: 'test'
+  ...
+# Subtest: diagnostic redaction removes credential fields and token query
+ok 16 - diagnostic redaction removes credential fields and token query
+  ---
+  duration_ms: 0.298442
+  type: 'test'
+  ...
+# Subtest: result references cannot borrow a foreign file object
+ok 17 - result references cannot borrow a foreign file object
+  ---
+  duration_ms: 0.146908
+  type: 'test'
+  ...
+# Subtest: result action prefers fileRef and jobId over paths
+ok 18 - result action prefers fileRef and jobId over paths
+  ---
+  duration_ms: 0.191934
+  type: 'test'
+  ...
+# Subtest: resolved result-action failure is an error
+ok 19 - resolved result-action failure is an error
+  ---
+  duration_ms: 0.22293
+  type: 'test'
+  ...
+# Subtest: data factory is synchronous and methods retain this
+ok 20 - data factory is synchronous and methods retain this
+  ---
+  duration_ms: 0.447032
+  type: 'test'
+  ...
+# Subtest: async data factory is a contract error
+ok 21 - async data factory is a contract error
+  ---
+  duration_ms: 0.112917
+  type: 'test'
+  ...
+# Subtest: data put false envelope is not success
+ok 22 - data put false envelope is not success
+  ---
+  duration_ms: 0.187248
+  type: 'test'
+  ...
+# Subtest: phone file identifier is not treated as staged identifier
+ok 23 - phone file identifier is not treated as staged identifier
+  ---
+  duration_ms: 0.149662
+  type: 'test'
+  ...
+# Subtest: packaged asset path traversal rejected
+ok 24 - packaged asset path traversal rejected
+  ---
+  duration_ms: 0.381425
+  type: 'test'
+  ...
+# Subtest: AI text request shape and text validation
+ok 25 - AI text request shape and text validation
+  ---
+  duration_ms: 0.278382
+  type: 'test'
+  ...
+# Subtest: AI missing text envelope fails loudly
+ok 26 - AI missing text envelope fails loudly
+  ---
+  duration_ms: 0.254167
+  type: 'test'
+  ...
+# Subtest: video uses create and the singular inputImage
+ok 27 - video uses create and the singular inputImage
+  ---
+  duration_ms: 0.467152
+  type: 'test'
+  ...
+# Subtest: shared dataset requires exact declared ID
+ok 28 - shared dataset requires exact declared ID
+  ---
+  duration_ms: 0.13566
+  type: 'test'
+  ...
+# Subtest: phone callback failures are contained
+ok 29 - phone callback failures are contained
+  ---
+  duration_ms: 6.13368
+  type: 'test'
+  ...
+# Subtest: blocking runJob captures ID before completion and supports cancellation
+ok 30 - blocking runJob captures ID before completion and supports cancellation
+  ---
+  duration_ms: 20.99511
+  type: 'test'
+  ...
+# Subtest: job envelope failure is not success
+ok 31 - job envelope failure is not success
+  ---
+  duration_ms: 19.987218
+  type: 'test'
+  ...
+# Subtest: parallel job submissions are blocked
+ok 32 - parallel job submissions are blocked
+  ---
+  duration_ms: 22.972056
+  type: 'test'
+  ...
+# Subtest: runtime failure blocks job execution
+ok 33 - runtime failure blocks job execution
+  ---
+  duration_ms: 0.453522
+  type: 'test'
+  ...
+# Subtest: queued host response keeps lock until polled terminal state
+ok 34 - queued host response keeps lock until polled terminal state
+  ---
+  duration_ms: 401.296468
+  type: 'test'
+  ...
+# Subtest: job timeout is unknown and late completion unlocks
+ok 35 - job timeout is unknown and late completion unlocks
+  ---
+  duration_ms: 32.092539
+  type: 'test'
+  ...
+# Subtest: subscriptions are removed on client disposal
+ok 36 - subscriptions are removed on client disposal
+  ---
+  duration_ms: 0.22945
+  type: 'test'
+  ...
+# Subtest: all English and Chinese message keys have parity
+ok 37 - all English and Chinese message keys have parity
+  ---
+  duration_ms: 0.970787
+  type: 'test'
+  ...
+1..37
+# tests 37
+# suites 0
+# pass 37
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 660.196159

@@ -1,0 +1,30 @@
+test_ai_text_profile_is_least_privilege (__main__.GeneratorTests.test_ai_text_profile_is_least_privilege) ... ok
+test_cdn_injection_fails (__main__.GeneratorTests.test_cdn_injection_fails) ... ok
+test_corrupt_manifest_fails (__main__.GeneratorTests.test_corrupt_manifest_fails) ... ok
+test_default_has_no_shared_fake_ids (__main__.GeneratorTests.test_default_has_no_shared_fake_ids) ... ok
+test_destination_overwrite_refused (__main__.GeneratorTests.test_destination_overwrite_refused) ... ok
+test_exact_shared_ids_in_both_files (__main__.GeneratorTests.test_exact_shared_ids_in_both_files) ... ok
+test_invalid_appid (__main__.GeneratorTests.test_invalid_appid) ... ok
+test_missing_asset_fails (__main__.GeneratorTests.test_missing_asset_fails) ... ok
+test_nine_profiles_validate (__main__.GeneratorTests.test_nine_profiles_validate) ... ok
+test_permission_mismatch_fails (__main__.GeneratorTests.test_permission_mismatch_fails) ... ok
+test_syntax_error_fails (__main__.GeneratorTests.test_syntax_error_fails) ... ok
+test_unexpected_shared_ids_rejected (__main__.GeneratorTests.test_unexpected_shared_ids_rejected) ... ok
+test_wildcard_rejected (__main__.GeneratorTests.test_wildcard_rejected) ... ok
+test_bad_delay (__main__.ProcessorTests.test_bad_delay) ... ok
+test_binary_hash (__main__.ProcessorTests.test_binary_hash) ... ok
+test_csv (__main__.ProcessorTests.test_csv) ... ok
+test_empty_text (__main__.ProcessorTests.test_empty_text) ... ok
+test_invalid_utf8 (__main__.ProcessorTests.test_invalid_utf8) ... ok
+test_json (__main__.ProcessorTests.test_json) ... ok
+test_malformed_json (__main__.ProcessorTests.test_malformed_json) ... ok
+test_no_input (__main__.ProcessorTests.test_no_input) ... ok
+test_result_does_not_overwrite_input (__main__.ProcessorTests.test_result_does_not_overwrite_input) ... ok
+test_sequence (__main__.ProcessorTests.test_sequence) ... ok
+test_sleep_fraction (__main__.ProcessorTests.test_sleep_fraction) ... ok
+test_unicode_filename_and_text (__main__.ProcessorTests.test_unicode_filename_and_text) ... ok
+
+----------------------------------------------------------------------
+Ran 25 tests in 8.390s
+
+OK

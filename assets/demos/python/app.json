@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "appId": "ceapp-demo-python",
+  "name": "CEAPP python demo",
+  "nameI18n": {
+    "zh-CN": "CEAPP python demo",
+    "en-US": "CEAPP python demo"
+  },
+  "version": "1.0.0",
+  "description": "CanEngine public bridge demonstration: python",
+  "descriptionI18n": {
+    "zh-CN": "CanEngine 桥接演示",
+    "en-US": "CanEngine public bridge demonstration"
+  },
+  "entry": "index.html",
+  "icon": "assets/logo.png",
+  "minCanEngineVersion": "1.7.3",
+  "platforms": [
+    {
+      "os": "*",
+      "arch": "*"
+    }
+  ],
+  "runtime": {
+    "requirements": [
+      {
+        "id": "base-runtime",
+        "optional": true
+      },
+      {
+        "id": "python-runtime",
+        "optional": true
+      }
+    ]
+  },
+  "commands": {
+    "inspect": {
+      "executable": "python3",
+      "baseArgs": [
+        "scripts/process_file.py"
+      ],
+      "allowedFlags": [
+        "--sleep"
+      ]
+    }
+  },
+  "capabilities": {},
+  "permissions": []
+}

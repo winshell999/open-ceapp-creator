@@ -1,170 +1,139 @@
 ---
 name: open-ceapp-creator
-description: Create or update a public, package-ready CanEngine CEAPP source project with an offline-capable local shell, zh-CN/en-US localization, minimal app.json permissions, browser-safe fallbacks, and current Host Bridge patterns. Use when generating a new CEAPP, improving an existing CEAPP, adding AI/Data/Phone/Notification/file/job integrations, or preparing a clean project folder for CanEngine packaging and signing. Do not use it to create trusted signatures, expose private implementation details, or embed credentials.
+description: Create, debug or refactor CanEngine CEAPP source projects with verified public host-bridge contracts, a tested adapter, runnable demos, least-privilege manifests and local UI assets. Use for file pick/open/export, Python jobs, runtime readiness, safe website opening, AI, local/shared data, Phone Bridge, notifications, clipboard, print, locale and diagnostics. Also use when a CEAPP works in a browser but fails inside CanEngine, or when packaging reports missing files or unsupported capabilities. Produce source, validation evidence and a host-acceptance checklist, not invented APIs or trusted signatures.
 ---
 
 # Open CEAPP Creator
 
-Create a clean CEAPP source project that another developer can understand, test, publish, and package in CanEngine. Optimize for one useful product flow, not maximum bridge coverage.
+Generate from verified contracts and tested components, not from remembered API names.
+Treat this skill as an executable generation workflow. Do not deliver a plan alone when asked for an app.
 
-## Public boundary
+## Deliverables
 
-Produce public-safe source files only. Do not generate or expose:
+Return a clean CEAPP source directory, a validation report, and a completed/pending native acceptance record.
+When updating this skill itself, return the complete `skill.zip`.
+Keep the app version independent of the host version. Do not manufacture official/KOL signatures.
 
-- official, publisher, or trusted signing secrets
-- a final trusted distribution package
-- private keys, signing tokens, reusable credentials, or real user licenses
-- private IP addresses, live session URLs, QR/pairing payloads, device identifiers, or absolute user paths
-- production-only endpoints, internal deployment instructions, database details, or private CanEngine implementation maps
+## Start with evidence
 
-Public product/documentation URLs and public repository identifiers are fine when intentionally public.
+1. With a supplied Canvas ID, first call `get_work_context_for_canvas` with that exact ID, confirm the returned ID, then use the same explicit ID on every Canvas operation.
+2. Read the selected UI skill and existing project entry/manifest/dependencies before editing. Back up changed files, preserve unrelated files and signer/license boundaries.
+3. Read `references/source-baseline.md` and `references/manifest-and-host-bridge.md`.
+4. Locate the user's handoff/current source through authorized Canvas tools. Resolve any disagreement against the public `window.CanEngine` implementation and the relevant Go types/runner. Do not use private source paths as shipped configuration.
+5. Record source version/date/hash and the methods actually consumed. If source is unavailable, use this snapshot conservatively and state that it was not refreshed. Do not invent methods to fill a gap.
+6. Distinguish the authoring MCP tools from the CEAPP runtime. A connector exposed to the AI is not automatically an app bridge. Never call arbitrary Wails/Go internals from CEAPP code.
 
-Use CanEngine's packaging and signing screen for the final `.ceapp`. Read `references/packaging-and-signing.md` before packaging handoff.
+## Select a narrow profile
 
-## Start with context
+Use the smallest matching profile from `scripts/create_ceapp.py`:
 
-1. Inspect the target directory before editing. Preserve unrelated user changes.
-2. If running in a CanEngine Canvas with Local MCP V2, read the active work context first. Use the exact Canvas ID supplied by the task for subsequent Canvas tools when the host requires explicit IDs. Read selected Skill content only through the Skill reader; do not guess paths or Canvas IDs.
-3. Write a one-sentence product contract: **user + task + finished result**.
-4. Choose a runtime strategy from `references/offline-runtime.md`. Default to `offline-strict`; use `hybrid-online` only when remote data or AI is part of the product.
-5. Choose the lightest implementation. Prefer local HTML/CSS/JS for small tools. Use a framework only when state or UI complexity justifies a local bundled build.
-6. For any nontrivial Host Bridge work, read `references/ceapp-integration-pitfalls.md` before coding.
-
-## Build the useful core
-
-1. Copy `assets/starter/` for a new project.
-2. Replace every starter identity consistently:
-   - directory name
-   - `app.json` `appId`, names, descriptions, and version
-   - JavaScript `APP_ID`
-   - Data Bridge collection names and database filename
-   - icon and visible product copy
-3. Keep `appId` stable after users have data. Changing it creates a different app/data identity.
-4. Keep the CEAPP version independent from the CanEngine host version.
-5. Implement one complete local workflow before optional bridges. Include empty, loading, success, and error states.
-6. Keep the first screen useful without remote CSS, JavaScript, fonts, icons, or content.
-
-The starter intentionally declares only app-private Data Bridge read/write access. Remove Data Bridge if the product does not persist data. Do not retain sample features or permissions that the final product does not use.
-
-## Add capabilities on demand
-
-Read `references/manifest-and-host-bridge.md` before changing `app.json` or calling `window.CanEngine`.
-
-For every capability added:
-
-1. Add exact capability metadata when the public schema requires it.
-2. Add only matching flat permission strings.
-3. Feature-detect the exact method before calling it.
-4. Provide a useful unavailable/error state.
-5. Add one visible operation that verifies the integration.
-6. Remove capability metadata and permission if the final UI never calls it.
-
-Additional routing:
-
-- Read `references/phone-bridge.md` when accepting or sending Phone Bridge files.
-- Read `references/bilingual-framework.md` before changing locale structure or user-facing copy.
-- Read `references/offline-runtime.md` when adding remote APIs, frameworks, fonts, or runtime dependencies.
-- Read `references/ceapp-integration-pitfalls.md` for browser-vs-host, native drop, Phone Bridge targeting, external navigation, and async lifecycle failures.
-
-## Host Bridge rules
-
-The fact that CanEngine desktop has a feature does **not** prove that a CEAPP can call it. The CEAPP contract is the capability actually exposed through `window.CanEngine` in the running host.
-
-- Resolve the bridge lazily from `window.CanEngine` or a safe `window.parent.CanEngine` fallback.
-- Never call `window.runtime.*` from CEAPP application code.
-- Never invent methods such as `openBrowser()`, `openExternal()`, or `getLatestPhoneFile()` because the desktop host appears to have a similar feature.
-- Manifest permissions do not create Host APIs; they only declare access to capabilities the host already supports.
-- Show success only after the Host Bridge call succeeds.
-- Keep browser fallback/degraded behavior where practical.
-
-## Standard interaction patterns
-
-- Treat CanEngine locale as the source of truth. `getLocale()` may be asynchronous; do not treat a Promise as a locale string.
-- Keep all user-facing text in matching `zh-CN` and `en-US` message tables.
-- Load package images/audio/video with `assetURL(appId, path)`; use relative URLs only as browser fallback.
-- Use `assetDataURL` only for small inline or copy-only cases.
-- Preview browser `File`/`Blob` objects with `URL.createObjectURL` and revoke old URLs.
-- Stage in-memory files with `stageFile({ appId, name, dataBase64, mime })`.
-- Stage host-native drops with `stageFile({ appId, sourcePath })`.
-- Normalize picker, browser drop, paste, native drop, and Phone Bridge input before business logic.
-- Capture stable application IDs/targets before starting asynchronous dialogs, transfers, AI jobs, or runtime jobs.
-- Store and call unsubscribe handlers for Bridge events; do not register duplicate listeners every time a modal opens.
-- Use `data.local(collection)` for app-private persistence; use `localStorage` only as browser-debug fallback or explicit cache.
-- Never request API keys inside a CEAPP. AI provider configuration stays in CanEngine.
-
-## Phone Bridge rule
-
-Phone Bridge is a host-level system capability. A CEAPP must not create its own LAN transfer service for normal intake.
-
-Most importantly:
-
-**opening the Phone Bridge panel is not the same as importing a file into the current CEAPP target.**
-
-For multiple targets, capture `targetId/purpose` first, establish the supported receive flow, then open Phone Bridge, read/normalize the host-managed file, and apply it back to the captured target. Do not infer the target from the currently selected DOM node after an asynchronous upload finishes.
-
-## External navigation rule
-
-A CEAPP runs in an embedded WebView, not a guaranteed top-level Chrome tab. If the current public Host Bridge does not expose a documented external-navigation method:
-
-- use a normal HTTPS link;
-- use `target="_blank"` / `rel="noopener noreferrer"` where appropriate;
-- offer Copy Link fallback when useful;
-- do not call private Wails/runtime APIs or shell commands from frontend JavaScript.
-
-## Keep the project root clean
-
-Package only runtime files:
-
-```text
-my-app/
-├── app.json
-├── index.html
-├── app.js
-├── styles.css
-├── assets/
-│   ├── ceapp-i18n.js
-│   └── logo.png
-├── data/                 # only when a local schema is declared
-│   └── localdb.schema.json
-└── scripts/              # only when a declared command needs them
-```
-
-Do not package design sources, archives, screenshots, old builds, private notes, `.env` files, signing material, logs, or unrelated docs.
-
-## Validate before handoff
-
-Run the bundled CEAPP validator:
+| Profile | Included workflow |
+|---|---|
+| `minimal` | Local shell, website/clipboard/print hooks, diagnostics |
+| `files` | Native/bounded browser input, staged-file opening, folder selection |
+| `python` | Files, declared Python script, runtime gate, cancel, managed results |
+| `ai-text` | Host AI status and text generation only |
+| `ai-media` | Files, text, vision, image, video and 3D task lifecycle |
+| `data` | App-private local collection CRUD, optionally exact shared resource IDs |
+| `phone` | Session/workbench, receive/import, explicitly confirmed phone send |
+| `notifications` | Immediate test notification and bridge settings |
+| `full` | Bridge Lab acceptance workbench, not the default for a business app |
 
 ```bash
-python3 scripts/validate_ceapp.py /path/to/ceapp-project
+python scripts/create_ceapp.py --app-id my-file-tool --name "My File Tool" --profile python --output /path/to/new-project
+python scripts/validate_ceapp.py /path/to/new-project --report /path/to/validation.json
 ```
 
-When working on this public repository itself, also run:
+For shared data, pass the real `--dataset` / `--action` IDs; the generator synchronizes manifest and configuration. Never seed a required imaginary dataset. Existing output directories are intentionally refused.
+
+## Build by reusing components
+
+Copy the generated project, then change business logic, message tables and the relevant panels.
+Use `assets/starter/assets/ce-bridge.js` for host resolution, bound calls, mutations, runtime checks, jobs and data stores.
+Use `assets/starter/assets/recipes.js` for AI/data/phone workflows.
+Read `references/demo-catalog.md` for nine complete demos and opt-in low-level examples.
+Do not copy `tests/` or simulated hosts into a distributable app.
+
+Treat the Lab as a functional reference, not an app customers must inherit. For a single-purpose app, replace the Lab navigation with one focused workflow; retain the adapter, visible states and validation gates. Update the bilingual title and manifest identity consistently.
+
+## Non-negotiable runtime rules
+
+- Resolve the bridge lazily. Catch cross-origin parent access. Prefer the app's injected instance; use the supported parent path only in the intended CanEngine launch context, not as authorization.
+- Wait a bounded time for injection, then show a useful host-missing state with Refresh. Never fabricate host success in browser preview.
+- Distinguish method availability, configuration, permission, runtime readiness and actual task outcome.
+- Inspect method-specific envelopes. A fulfilled Promise with `ok:false` is not success. A status query reporting a disabled feature is useful data, not a thrown exception.
+- Route every user action through `try/catch/finally` and a single-flight guard. Clean up event subscriptions and polling on page disposal.
+- Never automatically retry mutation/paid AI/send/install requests after timeout. Retain the unresolved action lock. Reconcile a late result with `recoverOutcome()` before another submission.
+- Keep staged IDs, Phone Bridge file IDs, managed result refs, authorized paths and AI task IDs distinct. Preserve provenance; never infer an OS path from a browser filename.
+- Use `openExternalURL()` for websites; allow only validated HTTP(S) without embedded credentials. Do not guess `openURL` or `openExternal`.
+- Native chooser cancellation is normal. Preserve cancellation without an error toast or false saved-file message.
+- Prefer native file selection for large files. Limit browser-to-base64 transfers; do not inline large media.
+- Prefer `assetURL` for package media and `{jobId,fileRef}` for result opening/exporting. Never retry a denied operation using a raw-path bypass.
+- Run only manifest-declared packaged scripts. Never execute a selected user file, interpolate a shell command, or install packages in a click handler.
+
+## Python and jobs
+
+Read `references/runtime-and-jobs.md` before implementing any task.
+The verified host blocks `runJob()` until execution ends. Subscribe to the full legacy `job:started` event BEFORE submission. Filter by appId/commandId and reject ambiguous ownership before cancellation. Do not await `runJob()` to obtain the first cancellable ID.
+Use the supplied controller rather than writing a second lifecycle implementation.
+Use managed output/result JSON and declared flags. Match runner CLI `-i`, repeated `--sequence` when needed, `-o`, `--result-json`. Check Python before execution; ask before installation. Never equate stop-waiting, cancel requested and terminal cancelled.
+
+## AI, database and phone
+
+Read the matching section of `references/bridge-recipes.md` and `references/phone-bridge.md`.
+Keep provider credentials, routing and charging configuration in the host. Generate only after explicit user action and disclose external transmission/costs. Do not run paid generation as an automatic smoke test.
+Use `ai.video.create` with the `ai.video.generate` permission. Treat video/3D as task lifecycles, not instant files.
+Use the synchronous `data.local(collection)` factory and declare the collection schema. Shared access uses exact datasets and actions, not raw SQL or database paths.
+Read a Phone Bridge `fileId` to Blob, then stage it before using it as a Python input. Treat QR/session values as secrets. Enforce sending confirmation in the app; do not rely on an ignored request flag.
+Never auto-create notification features at startup or resurrect a deleted feature. A registration example is not a background business producer.
+
+## Standard UI
+
+Read `references/standard-ui.md`. Adapt the selected design skill to the actual surface.
+For this utility, use native local HTML/CSS/JS, consistent tokens, restrained typography, compact actions, light/dark themes and explicit responsive collapse. Do not force marketing-page hero rules onto a utility.
+Keep labels above inputs; provide loading/empty/error/disabled/success/cancelled/unknown states.
+Use textContent for filenames, AI output and diagnostics unless a sanitizer is deliberately provided.
+Centralize `zh-CN`/`en-US` copy in `assets/ceapp-i18n.js`; follow host locale and unsubscribe cleanly.
+Use system fonts. Never require a CDN for first paint.
+
+## Mandatory validation gates
+
+Run these scripts from the skill root in an environment supporting Python 3.10+ and Node 18+:
 
 ```bash
-python3 scripts/audit_public_repo.py
+node --test tests/bridge.test.cjs
+python tests/test_tools.py
+python scripts/audit_contract.py assets
+python scripts/validate_ceapp.py /path/to/generated-app --report /path/to/validation.json
 ```
 
-Then verify manually:
+For UI changes, run `tests/browser_smoke.py` on the full Lab with Playwright + Chromium installed. This runner inlines local files because some controlled browsers block navigation; it does NOT verify native asset routing. Test a generated business app's actual workflow separately. Never silently skip missing dependencies and mark PASS.
 
-1. The useful core works in a normal browser.
-2. The app launches inside CanEngine with no blank first screen.
-3. Host locale changes rerender visible copy.
-4. Package media loads through `assetURL`.
-5. Every permission maps to called code and a user-visible feature.
-6. Optional bridges fail gracefully when unavailable, disabled, or denied.
-7. Keyboard focus, labels, empty states, and reduced motion are usable.
-8. No secret, personal path, private network detail, session URL, raw diagnostics, or internal endpoint is present.
-9. `app.json` and JavaScript use the same `appId`.
-10. The final project folder contains only files required at runtime.
-11. Phone Bridge/file-drop/AI/notification/job workflows are tested inside CanEngine when used; Chrome-only success is insufficient.
+Execute the produced Python script with a real fixture as well as syntax checking it. Test malformed/empty/Unicode input, cancel, unavailable runtime, permission denial, duplicate submit and negative envelopes. Extend tests when a new behavior is added.
 
-Fix validation failures before packaging. Treat warnings as review prompts; do not silence them without checking the source.
+Read `references/testing-and-acceptance.md`. Mark each layer independently:
+`PASS`, `FAIL`, `BLOCKED`, `NOT_RUN`, `SIMULATED`.
+The native gate must include installed CanEngine on each claimed OS, real file pick/open/export, runtime, shared permission behavior, relevant configured AI/device flows and package installation. Do not label browser mocks or absence of build logs as native success.
+Fix failures before shipping or explicitly mark the unresolved gate. Do not claim that all future generated apps are guaranteed error-free.
 
-## Packaging handoff
+## Deliver and explain
 
-Hand the clean project root to CanEngine:
+Provide the source location, short operation instructions, exact tests/results, pending native checks, and minimal relevant diagnostics. Use `references/packaging-and-signing.md` for the final client-side packaging flow.
+For Canvas tasks, actually write the deliverable into that Canvas and read it back. A local ZIP alone is not Canvas completion.
+Keep backups outside app package roots. Use `references/troubleshooting.md` to investigate failures without trying invented APIs.
 
-`CanEngine → 我的 → 开发者身份 / CEAPP打包与签名 → 选择或拖入项目根目录 → 检查 → 打包并签名`
+## Reference map
 
-Describe a signature as source/integrity metadata, not a security audit. Do not tell users that public source files can create official/trusted signing identities or bypass CanEngine authorization.
+- `references/source-baseline.md`: inspected implementation, versions, checksums, known limitations.
+- `references/manifest-and-host-bridge.md`: public API contract, permissions and file types.
+- `references/bridge-methods.json`: current source snapshot of public methods and factory members.
+- `references/runtime-and-jobs.md`: blocking jobs, CLI/result contract and ownership.
+- `references/bridge-recipes.md`: AI/data/system/notifications recipe guidance.
+- `references/phone-bridge.md`: session, receive, import, send, expiry and permissions.
+- `references/standard-ui.md`: reusable UI defaults and examples.
+- `references/bilingual-framework.md`: locale and helper migration.
+- `references/offline-runtime.md`: local startup and dependency boundaries.
+- `references/demo-catalog.md`: complete projects and extension examples.
+- `references/testing-and-acceptance.md`: evidence levels and native checklist.
+- `references/troubleshooting.md`: symptom-to-contract checks.
+- `references/packaging-and-signing.md`: clean source and authorized signing.

@@ -1,0 +1,30 @@
+{
+  "ok": true,
+  "checks": [
+    "hostless preview is explicit",
+    "refresh remains usable without host",
+    "1440px/light: all 9 panels, no horizontal overflow",
+    "1440px/dark: all 9 panels, no horizontal overflow",
+    "768px/light: all 9 panels, no horizontal overflow",
+    "768px/dark: all 9 panels, no horizontal overflow",
+    "390px/light: all 9 panels, no horizontal overflow",
+    "390px/dark: all 9 panels, no horizontal overflow",
+    "standalone local file preview works",
+    "locale switches UI copy",
+    "simulated host detection",
+    "simulated staged file > job > results > open/export",
+    "simulated runtime readiness",
+    "simulated AI explicit action",
+    "simulated local CRUD",
+    "simulated phone workflow",
+    "simulated web/clipboard/print/notification/asset",
+    "diagnostics redacted",
+    "runtime-negative envelope visible",
+    "no uncaught page errors; no external startup requests"
+  ],
+  "uncaughtErrors": [],
+  "externalStartupRequests": [],
+  "nativeHostTested": false,
+  "assetTransport": "Local HTML/CSS/JS inlined with set_content/add_script_tag. Both file:// and URL navigation are blocked by browser policy; package URL resolution was NOT browser-tested.",
+  "fixtureNotice": "Simulated host is test-only; no AI provider, device or native bridge was called."
+}

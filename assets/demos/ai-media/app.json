@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "appId": "ceapp-demo-ai-media",
+  "name": "CEAPP ai-media demo",
+  "nameI18n": {
+    "zh-CN": "CEAPP ai-media demo",
+    "en-US": "CEAPP ai-media demo"
+  },
+  "version": "1.0.0",
+  "description": "CanEngine public bridge demonstration: ai-media",
+  "descriptionI18n": {
+    "zh-CN": "CanEngine 桥接演示",
+    "en-US": "CanEngine public bridge demonstration"
+  },
+  "entry": "index.html",
+  "icon": "assets/logo.png",
+  "minCanEngineVersion": "1.7.3",
+  "platforms": [
+    {
+      "os": "*",
+      "arch": "*"
+    }
+  ],
+  "runtime": {
+    "requirements": [
+      {
+        "id": "base-runtime",
+        "optional": true
+      }
+    ]
+  },
+  "commands": {
+    "noop": {
+      "executable": "echo",
+      "baseArgs": [
+        "ceapp-demo-ai-media"
+      ]
+    }
+  },
+  "capabilities": {
+    "ai": {
+      "required": false,
+      "features": [
+        "ai.text.generate",
+        "ai.vision.analyze",
+        "ai.image.generate",
+        "ai.model3d.generate",
+        "ai.video.generate"
+      ]
+    }
+  },
+  "permissions": [
+    "ai.text.generate",
+    "ai.vision.analyze",
+    "ai.image.generate",
+    "ai.model3d.generate",
+    "ai.video.generate"
+  ]
+}

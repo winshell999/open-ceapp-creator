@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "appId": "ceapp-demo-files",
+  "name": "CEAPP files demo",
+  "nameI18n": {
+    "zh-CN": "CEAPP files demo",
+    "en-US": "CEAPP files demo"
+  },
+  "version": "1.0.0",
+  "description": "CanEngine public bridge demonstration: files",
+  "descriptionI18n": {
+    "zh-CN": "CanEngine 桥接演示",
+    "en-US": "CanEngine public bridge demonstration"
+  },
+  "entry": "index.html",
+  "icon": "assets/logo.png",
+  "minCanEngineVersion": "1.7.3",
+  "platforms": [
+    {
+      "os": "*",
+      "arch": "*"
+    }
+  ],
+  "runtime": {
+    "requirements": [
+      {
+        "id": "base-runtime",
+        "optional": true
+      }
+    ]
+  },
+  "commands": {
+    "noop": {
+      "executable": "echo",
+      "baseArgs": [
+        "ceapp-demo-files"
+      ]
+    }
+  },
+  "capabilities": {},
+  "permissions": []
+}

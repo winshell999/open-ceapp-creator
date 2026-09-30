@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "appId": "ceapp-demo-data",
+  "name": "CEAPP data demo",
+  "nameI18n": {
+    "zh-CN": "CEAPP data demo",
+    "en-US": "CEAPP data demo"
+  },
+  "version": "1.0.0",
+  "description": "CanEngine public bridge demonstration: data",
+  "descriptionI18n": {
+    "zh-CN": "CanEngine 桥接演示",
+    "en-US": "CanEngine public bridge demonstration"
+  },
+  "entry": "index.html",
+  "icon": "assets/logo.png",
+  "minCanEngineVersion": "1.7.3",
+  "platforms": [
+    {
+      "os": "*",
+      "arch": "*"
+    }
+  ],
+  "runtime": {
+    "requirements": [
+      {
+        "id": "base-runtime",
+        "optional": true
+      }
+    ]
+  },
+  "commands": {
+    "noop": {
+      "executable": "echo",
+      "baseArgs": [
+        "ceapp-demo-data"
+      ]
+    }
+  },
+  "capabilities": {
+    "dataBridge": {
+      "required": false,
+      "datasets": [],
+      "actions": [],
+      "mode": "read",
+      "local": {
+        "enabled": true,
+        "dbFile": "bridge-lab.sqlite",
+        "schemaEntry": "data/localdb.schema.json",
+        "schemaVersion": 1
+      }
+    }
+  },
+  "permissions": [
+    "data.read",
+    "data.write"
+  ]
+}

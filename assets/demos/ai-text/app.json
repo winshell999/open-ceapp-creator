@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "appId": "ceapp-demo-ai-text",
+  "name": "CEAPP ai-text demo",
+  "nameI18n": {
+    "zh-CN": "CEAPP ai-text demo",
+    "en-US": "CEAPP ai-text demo"
+  },
+  "version": "1.0.0",
+  "description": "CanEngine public bridge demonstration: ai-text",
+  "descriptionI18n": {
+    "zh-CN": "CanEngine 桥接演示",
+    "en-US": "CanEngine public bridge demonstration"
+  },
+  "entry": "index.html",
+  "icon": "assets/logo.png",
+  "minCanEngineVersion": "1.7.3",
+  "platforms": [
+    {
+      "os": "*",
+      "arch": "*"
+    }
+  ],
+  "runtime": {
+    "requirements": [
+      {
+        "id": "base-runtime",
+        "optional": true
+      }
+    ]
+  },
+  "commands": {
+    "noop": {
+      "executable": "echo",
+      "baseArgs": [
+        "ceapp-demo-ai-text"
+      ]
+    }
+  },
+  "capabilities": {
+    "ai": {
+      "required": false,
+      "features": [
+        "ai.text.generate"
+      ]
+    }
+  },
+  "permissions": [
+    "ai.text.generate"
+  ]
+}

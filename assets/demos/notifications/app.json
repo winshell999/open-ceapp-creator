@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "appId": "ceapp-demo-notifications",
+  "name": "CEAPP notifications demo",
+  "nameI18n": {
+    "zh-CN": "CEAPP notifications demo",
+    "en-US": "CEAPP notifications demo"
+  },
+  "version": "1.0.0",
+  "description": "CanEngine public bridge demonstration: notifications",
+  "descriptionI18n": {
+    "zh-CN": "CanEngine 桥接演示",
+    "en-US": "CanEngine public bridge demonstration"
+  },
+  "entry": "index.html",
+  "icon": "assets/logo.png",
+  "minCanEngineVersion": "1.7.3",
+  "platforms": [
+    {
+      "os": "*",
+      "arch": "*"
+    }
+  ],
+  "runtime": {
+    "requirements": [
+      {
+        "id": "base-runtime",
+        "optional": true
+      }
+    ]
+  },
+  "commands": {
+    "noop": {
+      "executable": "echo",
+      "baseArgs": [
+        "ceapp-demo-notifications"
+      ]
+    }
+  },
+  "capabilities": {
+    "notification": {
+      "required": false,
+      "reason": "User-triggered test notification",
+      "capabilities": [
+        "send"
+      ]
+    }
+  },
+  "permissions": [
+    "notification.send"
+  ]
+}

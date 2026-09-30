@@ -1,0 +1,480 @@
+{
+  "baseline": "CanEngine 1.7.3 source snapshot",
+  "inspectedAt": "2026-09-26",
+  "notice": "Availability is not permission/configuration/readiness. This inventory is not a native test pass.",
+  "methods": [
+    {
+      "method": "getCapabilities",
+      "group": "host",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "hasCapability",
+      "group": "host",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "getHostVersion",
+      "group": "host",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "getRuntimeStatus",
+      "group": "runtime",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "requireRuntime",
+      "group": "runtime",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "listRuntimes",
+      "group": "runtime",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "checkRuntimes",
+      "group": "runtime",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "installRuntime",
+      "group": "runtime",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "getAppRuntimeStatus",
+      "group": "runtime",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "envCheck",
+      "group": "runtime",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "envInstall",
+      "group": "runtime",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "stageFile",
+      "group": "input",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "getStagedFile",
+      "group": "input",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "removeStagedFile",
+      "group": "input",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "stageFileDialog",
+      "group": "input",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "stageFilesDialog",
+      "group": "input",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "chooseFile",
+      "group": "input",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "chooseFiles",
+      "group": "input",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "chooseDirectory",
+      "group": "input",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "onFileDrop",
+      "group": "input",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "assetURL",
+      "group": "assets",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "assetDataURL",
+      "group": "assets",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "runJob",
+      "group": "jobs",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "getJob",
+      "group": "jobs",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "listJobs",
+      "group": "jobs",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "getJobLogs",
+      "group": "jobs",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "cancelJob",
+      "group": "jobs",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "onEvent",
+      "group": "jobs",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "exportFile",
+      "group": "output",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "openFile",
+      "group": "output",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "revealFile",
+      "group": "output",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "resultDataURL",
+      "group": "output",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "saveAs",
+      "group": "output",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "saveImageDataURL",
+      "group": "output",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "copyResult",
+      "group": "output",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "copyImageDataURL",
+      "group": "output",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "openResult",
+      "group": "output",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "revealResult",
+      "group": "output",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "openExternalURL",
+      "group": "system",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "clipboard.writeText",
+      "group": "system",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "clipboard.writeImage",
+      "group": "system",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "printHTML",
+      "group": "system",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "print",
+      "group": "system",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "getDiagnostics",
+      "group": "system",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "copyDiagnostics",
+      "group": "system",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "exportDiagnostics",
+      "group": "system",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "getLocale",
+      "group": "locale",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "setLocale",
+      "group": "locale",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "onLocaleChange",
+      "group": "locale",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "ai.getStatus",
+      "group": "ai",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "ai.text.generate",
+      "group": "ai",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "ai.vision.analyze",
+      "group": "ai",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "ai.image.generate",
+      "group": "ai",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "ai.model3d.generate",
+      "group": "ai",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "ai.model3d.getTask",
+      "group": "ai",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "ai.model3d.cancelTask",
+      "group": "ai",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "ai.video.create",
+      "group": "ai",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "ai.video.getTask",
+      "group": "ai",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "ai.video.cancelTask",
+      "group": "ai",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "data.local",
+      "group": "data",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "data.dataset",
+      "group": "data",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "data.schema",
+      "group": "data",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "data.action",
+      "group": "data",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "phoneBridge.openPanel",
+      "group": "phone",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "phoneBridge.createSession",
+      "group": "phone",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "phoneBridge.onFilesReceived",
+      "group": "phone",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "phoneBridge.readFile",
+      "group": "phone",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "phoneBridge.addFile",
+      "group": "phone",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "phoneBridge.sendToPhone",
+      "group": "phone",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "notification.send",
+      "group": "notification",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "notification.registerFeature",
+      "group": "notification",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "notification.updateFeature",
+      "group": "notification",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "notification.removeFeature",
+      "group": "notification",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "notification.listOwnFeatures",
+      "group": "notification",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "notification.getStatus",
+      "group": "notification",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    },
+    {
+      "method": "notification.openSettings",
+      "group": "notification",
+      "evidence": "frontend/src/main.jsx public bridge snapshot",
+      "verification": "source-inspected; native-not-run"
+    }
+  ],
+  "factoryMembers": [
+    {
+      "factory": "data.local(collection)",
+      "members": [
+        "get(id)",
+        "find(request)",
+        "put(record)",
+        "delete(id)"
+      ]
+    },
+    {
+      "factory": "data.dataset(datasetId)",
+      "members": [
+        "find(request)"
+      ]
+    }
+  ]
+}

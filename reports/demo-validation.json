@@ -1,0 +1,148 @@
+[
+  {
+    "profile": "minimal",
+    "ok": true,
+    "errors": [],
+    "warnings": [
+      "Native host/WebView/real AI/phone/signing acceptance is a separate mandatory gate."
+    ],
+    "checks": [
+      "js-syntax:app-config.js",
+      "js-syntax:app.js",
+      "js-syntax:assets/recipes.js",
+      "js-syntax:assets/ceapp-i18n.js",
+      "js-syntax:assets/ce-bridge.js"
+    ],
+    "appId": "ceapp-demo-minimal"
+  },
+  {
+    "profile": "files",
+    "ok": true,
+    "errors": [],
+    "warnings": [
+      "Native host/WebView/real AI/phone/signing acceptance is a separate mandatory gate."
+    ],
+    "checks": [
+      "js-syntax:app-config.js",
+      "js-syntax:app.js",
+      "js-syntax:assets/recipes.js",
+      "js-syntax:assets/ceapp-i18n.js",
+      "js-syntax:assets/ce-bridge.js"
+    ],
+    "appId": "ceapp-demo-files"
+  },
+  {
+    "profile": "python",
+    "ok": true,
+    "errors": [],
+    "warnings": [
+      "Native host/WebView/real AI/phone/signing acceptance is a separate mandatory gate."
+    ],
+    "checks": [
+      "js-syntax:app-config.js",
+      "js-syntax:app.js",
+      "python-syntax:scripts/process_file.py",
+      "js-syntax:assets/recipes.js",
+      "js-syntax:assets/ceapp-i18n.js",
+      "js-syntax:assets/ce-bridge.js"
+    ],
+    "appId": "ceapp-demo-python"
+  },
+  {
+    "profile": "ai-text",
+    "ok": true,
+    "errors": [],
+    "warnings": [
+      "Native host/WebView/real AI/phone/signing acceptance is a separate mandatory gate."
+    ],
+    "checks": [
+      "js-syntax:app-config.js",
+      "js-syntax:app.js",
+      "js-syntax:assets/recipes.js",
+      "js-syntax:assets/ceapp-i18n.js",
+      "js-syntax:assets/ce-bridge.js"
+    ],
+    "appId": "ceapp-demo-ai-text"
+  },
+  {
+    "profile": "ai-media",
+    "ok": true,
+    "errors": [],
+    "warnings": [
+      "Native host/WebView/real AI/phone/signing acceptance is a separate mandatory gate."
+    ],
+    "checks": [
+      "js-syntax:app-config.js",
+      "js-syntax:app.js",
+      "js-syntax:assets/recipes.js",
+      "js-syntax:assets/ceapp-i18n.js",
+      "js-syntax:assets/ce-bridge.js"
+    ],
+    "appId": "ceapp-demo-ai-media"
+  },
+  {
+    "profile": "data",
+    "ok": true,
+    "errors": [],
+    "warnings": [
+      "Native host/WebView/real AI/phone/signing acceptance is a separate mandatory gate."
+    ],
+    "checks": [
+      "js-syntax:app-config.js",
+      "js-syntax:app.js",
+      "js-syntax:assets/recipes.js",
+      "js-syntax:assets/ceapp-i18n.js",
+      "js-syntax:assets/ce-bridge.js"
+    ],
+    "appId": "ceapp-demo-data"
+  },
+  {
+    "profile": "phone",
+    "ok": true,
+    "errors": [],
+    "warnings": [
+      "Native host/WebView/real AI/phone/signing acceptance is a separate mandatory gate."
+    ],
+    "checks": [
+      "js-syntax:app-config.js",
+      "js-syntax:app.js",
+      "js-syntax:assets/recipes.js",
+      "js-syntax:assets/ceapp-i18n.js",
+      "js-syntax:assets/ce-bridge.js"
+    ],
+    "appId": "ceapp-demo-phone"
+  },
+  {
+    "profile": "notifications",
+    "ok": true,
+    "errors": [],
+    "warnings": [
+      "Native host/WebView/real AI/phone/signing acceptance is a separate mandatory gate."
+    ],
+    "checks": [
+      "js-syntax:app-config.js",
+      "js-syntax:app.js",
+      "js-syntax:assets/recipes.js",
+      "js-syntax:assets/ceapp-i18n.js",
+      "js-syntax:assets/ce-bridge.js"
+    ],
+    "appId": "ceapp-demo-notifications"
+  },
+  {
+    "profile": "full",
+    "ok": true,
+    "errors": [],
+    "warnings": [
+      "Native host/WebView/real AI/phone/signing acceptance is a separate mandatory gate."
+    ],
+    "checks": [
+      "js-syntax:app-config.js",
+      "js-syntax:app.js",
+      "python-syntax:scripts/process_file.py",
+      "js-syntax:assets/recipes.js",
+      "js-syntax:assets/ceapp-i18n.js",
+      "js-syntax:assets/ce-bridge.js"
+    ],
+    "appId": "ceapp-demo-full"
+  }
+]
