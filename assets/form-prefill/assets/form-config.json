@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "request": null,
+  "titleI18n": {
+    "zh-CN": "表单预填",
+    "en-US": "Form Prefill"
+  },
+  "labels": {},
+  "options": {},
+  "formatHints": {}
+}

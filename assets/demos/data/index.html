@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>CEAPP Bridge Lab</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app-config.js" defer></script>
+  <script src="assets/ce-bridge.js" defer></script>
+  <script src="assets/ceapp-i18n.js" defer></script>
+  <script src="assets/recipes.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar"><div class="brand"><span class="brand-mark" aria-hidden="true">CE</span><strong id="title">CEAPP Bridge Lab</strong></div><span id="host-status" class="status">Detecting host</span></header>
+    <nav id="navigation" aria-label="Bridge modules"></nav>
+    <main id="main">
+      <p id="intro" class="intro">Verify one bridge at a time.</p>
+      <div id="preview-notice" class="notice" role="status" hidden></div>
+      <div id="content"></div>
+      <section class="result-panel" aria-labelledby="result-heading">
+        <div class="result-head"><h2 id="result-heading">Result</h2><span id="action-status" role="status" aria-live="polite"></span></div>
+        <p id="error-message" class="error-message" role="alert" hidden></p>
+        <pre id="output" tabindex="0">No operation yet.</pre>
+      </section>
+      <footer class="preferences">
+        <label><span id="locale-label">Language</span><select id="locale"><option value="zh-CN">中文</option><option value="en-US">English</option></select></label>
+        <label><span id="theme-label">Theme</span><select id="theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
+      </footer>
+    </main>
+  </div>
+</body>
+</html>

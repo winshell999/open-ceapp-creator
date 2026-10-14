@@ -1,0 +1,39 @@
+name: Validate public CEAPP source
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Audit public repository
+        run: python3 scripts/audit_public_repo.py
+
+      - name: Validate starter CEAPP
+        run: python3 scripts/validate_ceapp.py assets/starter
+
+      - name: Check Python scripts
+        run: python3 -m py_compile scripts/validate_ceapp.py scripts/audit_public_repo.py
+
+      - name: Check JavaScript syntax
+        run: |
+          node --check assets/starter/app.js
+          node --check assets/starter/assets/ceapp-i18n.js

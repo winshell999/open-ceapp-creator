@@ -1,0 +1,17 @@
+{
+  "source": "CanEngine",
+  "version": "1.8.0",
+  "inspected_on": "2026-10-14",
+  "files": {
+    "internal/engine/types.go": "5252a2033b62fcbbd61a8d4e24a41401b47e476bb88c1ae08f41bd32b07b8323",
+    "internal/engine/remote_web_manifest.go": "cc253b986cd9eb8bfe1376de0e28ac91fbb76213bb487bf8dff09feb73405649",
+    "internal/engine/remote_web_authorization.go": "4f8fe5e347a681a00303f8fceeea5260bf905ef1d372afaba048b602939b8b61",
+    "internal/remoteweb/authorization.go": "39befc5b2990ad9a435b0836589212461c2aafeba9f419bebb7b3f7fef8c7662",
+    "internal/remoteweb/native_darwin.m": "9fe87c536fa7adb212ea9964f99ad81d517e1f211350f97194bf4f84b50236b1",
+    "internal/remoteweb/native_windows.go": "16ef70b402afafadb826cfbd0d29199e1b844e5c817435e05b809228e60b5b94",
+    "internal/desktopapp/app_remote_web.go": "66cb12cde23549b51e136bfa5c2dbb1d078122e5d36345923bc8ebace88ce6b6",
+    "CanEngineAPI/internal/model/canengine_remote_web.go": "fe602b6c141c69d393fc92a2bdb4ec37a733dc619700f48b824bb46574db3e11",
+    "CanEngineAPI/internal/service/canengine_remote_web_service.go": "b2f2bf40ed6eaab851836279f3392dd2ba5a75e589f1630da66f51fae560176a"
+  },
+  "privacy": "Repository-relative file names and hashes only; no configuration, secrets, personal paths or runtime payloads."
+}

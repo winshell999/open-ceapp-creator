@@ -1,0 +1,34 @@
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log
+
+# Local secrets and signing material
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Generated packages / build output
+*.ceapp
+dist/
+build/
+release/
+
+# Runtime / dependency caches
+node_modules/
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+
+# Local acceptance captures/logs require privacy review before publication.
+# Existing tracked public evidence is unaffected; new reviewed records are explicit.
+reports/*
+!reports/REMOTE_WEB_AUTH_SOURCE_SHA256.json
+!reports/REMOTE_WEB_AUTH_VALIDATION_REPORT.md

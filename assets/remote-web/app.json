@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "appId": "remote-web-example",
+  "name": "远程网站示例",
+  "nameI18n": {
+    "zh-CN": "远程网站示例",
+    "en-US": "Remote Website Example"
+  },
+  "version": "1.8.0",
+  "description": "通过CanEngine访问远程网站，需要网络。",
+  "descriptionI18n": {
+    "zh-CN": "通过CanEngine访问远程网站，需要网络。",
+    "en-US": "Open a remote website through CanEngine. Requires internet access."
+  },
+  "icon": "assets/icon.svg",
+  "minCanEngineVersion": "1.8.0",
+  "platforms": [
+    {
+      "os": "darwin",
+      "arch": "*"
+    },
+    {
+      "os": "windows",
+      "arch": "amd64"
+    }
+  ],
+  "runtime": {
+    "remoteWeb": {
+      "url": "https://example.com/app/",
+      "storage": "persistent"
+    }
+  },
+  "permissions": [
+    "web.network"
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "appId": "web-host-demo",
+  "name": "Persistent Web Demo",
+  "nameI18n": {
+    "zh-CN": "常驻 Web 应用示例",
+    "en-US": "Persistent Web Demo"
+  },
+  "version": "1.8.0",
+  "description": "An existing Python HTTP website hosted without rewriting its routes.",
+  "descriptionI18n": {
+    "zh-CN": "保留 HTTP 路由的 Python 网站，复用内存状态及 SQLite 连接。",
+    "en-US": "A Python website retaining HTTP routes, in-memory state and its SQLite connection."
+  },
+  "entry": "server.py",
+  "minCanEngineVersion": "1.8.0",
+  "platforms": [
+    {
+      "os": "*",
+      "arch": "*"
+    }
+  ],
+  "runtime": {
+    "requirements": [
+      {
+        "id": "base-runtime"
+      }
+    ],
+    "web": {
+      "executable": "python3",
+      "args": [
+        "server.py"
+      ],
+      "pythonAdapter": "http-server",
+      "readyPath": "/health",
+      "network": "loopback"
+    }
+  },
+  "commands": {},
+  "permissions": []
+}

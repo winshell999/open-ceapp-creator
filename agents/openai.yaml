@@ -1,0 +1,4 @@
+interface:
+  display_name: "Open CEAPP Creator"
+  short_description: "Create CEAPPs, including website form prefill from JSON"
+  default_prompt: "Use $open-ceapp-creator to create or repair a CanEngine CEAPP. For a website URL and prefill intent, research the real fields and create a focused local runtime.web app with the controlled CanEngine 1.8.0 browser.prefill JSON bridge, fixed approved HTTPS targets and manual verification/submission. Generate and validate the mapping without asking me to invent selectors. Otherwise choose local HTML, persistent local Web or remote website mode from my intent. Preserve existing data, versions and permissions; support optional Python compilation. Deliver source and distinguish actual CanEngine native acceptance from simulations."

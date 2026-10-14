@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "appId": "form-prefill-template",
+  "name": "Form Prefill",
+  "nameI18n": {
+    "zh-CN": "表单预填",
+    "en-US": "Form Prefill"
+  },
+  "version": "1.8.0",
+  "description": "Local form preparation with authorized native website prefill.",
+  "descriptionI18n": {
+    "zh-CN": "在本地准备信息，在授权网站中预填并人工确认。",
+    "en-US": "Prepare data locally, prefill the authorized website and review manually."
+  },
+  "entry": "server.py",
+  "icon": "assets/icon.svg",
+  "minCanEngineVersion": "1.8.0",
+  "platforms": [
+    {
+      "os": "darwin",
+      "arch": "*"
+    },
+    {
+      "os": "windows",
+      "arch": "amd64"
+    }
+  ],
+  "runtime": {
+    "requirements": [
+      {
+        "id": "base-runtime"
+      }
+    ],
+    "web": {
+      "executable": "python3",
+      "args": [
+        "server.py"
+      ],
+      "pythonAdapter": "http-server",
+      "workingDir": ".",
+      "entryPath": "/",
+      "readyPath": "/health",
+      "startupTimeoutMs": 20000,
+      "network": "loopback"
+    }
+  },
+  "commands": {},
+  "permissions": [
+    "browser.form.prefill"
+  ],
+  "capabilities": {
+    "browser": {
+      "profiles": [
+        "form-prefill-v1"
+      ],
+      "targets": []
+    }
+  }
+}

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Persistent Web Demo</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+  <script src="/assets/ceapp-i18n.js"></script>
+  <script src="/assets/app.js" defer></script>
+</head>
+<body>
+  <main>
+    <span class="badge">HTTP · SQLite · CEAPP</span>
+    <h1 data-i18n="title"></h1>
+    <p data-i18n="description"></p>
+    <section class="metrics" aria-live="polite">
+      <div><label data-i18n="pid"></label><strong id="pid">—</strong></div>
+      <div><label data-i18n="connection"></label><strong id="connection">—</strong></div>
+      <div><label data-i18n="requests"></label><strong id="requests">—</strong></div>
+    </section>
+    <button id="refresh" data-i18n="refresh"></button>
+    <h2 data-i18n="notes"></h2>
+    <form id="note-form"><input id="note" maxlength="1000" required><button data-i18n="save"></button></form>
+    <ul id="notes"></ul>
+    <h2 data-i18n="files"></h2>
+    <input id="upload" type="file">
+    <a href="/download" download="sample.bin" data-i18n="download"></a>
+    <output id="result" aria-live="polite"></output>
+  </main>
+</body>
+</html>
